@@ -8,7 +8,7 @@ export default function ExpensePieChart({ data }) {
   return (
     <div style={{ width: '100%', height: 400 }}>
       {
-        (data && data.length > 0) ? (
+        (Array.isArray(data) && data.length > 0) ? (
           <ResponsiveContainer>
             <PieChart>
               <Pie
