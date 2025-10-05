@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import MoneyCard from '../components/MoneyCard'
 import SimpleLineChart from '../components/SimpleLineChart'
 import PieChart from '../components/PieChart'
 import { useAppContext } from '../contexts/AppProvider'
 
 function Dashboard() {
-  const { statistic, yearData } = useAppContext();
+  const [statistic, setStatistic] = useState({ categoryBreakdown: [] });
+  const [yearData, setYearData] = useState([]);
+
   return (
     <div>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
