@@ -1,40 +1,38 @@
 import Budget from '../models/Budget.js';
 import Transaction from '../models/Transaction.js';
 
+
 export const addBudget = async (req, res) => {
   try {
-    const { category, amount, month } = req.body;
-    const user = req.user._id;
-
-    const budget = await Budget.create({ user, category, amount, month });
+    const { category, amount } = req.body;
+    const userId = req.user.id;
+    const budget = await Budget.create({ category, amount, UserId: userId });
     res.status(201).json(budget);
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
+
 export const getBudgets = async (req, res) => {
   try {
-    const budgets = await Budget.find({ user: req.user._id });
+    const budgets = await Budget.findAll({ where: { UserId: req.user.id } });
     res.status(200).json(budgets);
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
+
 export const updateBudget = async (req, res) => {
   try {
     const { id } = req.params;
     const { category, amount } = req.body;
-
-    const budget = await Budget.findOneAndUpdate(
-      { _id: id, user: req.user._id },
-      { category, amount },
-      { new: true }
-    );
-
+    const budget = await Budget.findOne({ where: { id, UserId: req.user.id } });
     if (!budget) return res.status(404).json({ message: 'Budget not found' });
-
+    budget.category = category;
+    budget.amount = amount;
+    await budget.save();
     res.status(200).json(budget);
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });

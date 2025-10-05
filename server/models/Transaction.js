@@ -1,12 +1,17 @@
-import mongoose from 'mongoose';
 
-const TransactionSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  type: { type: String, enum: ['Income', 'Expense'], required: true },
-  category: { type: String, required: true },
-  amount: { type: Number, required: true },
-  description: { type: String },
-  date: { type: Date, default: Date.now },
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
+import User from './User.js';
+
+const Transaction = sequelize.define('Transaction', {
+  type: { type: DataTypes.ENUM('Income', 'Expense'), allowNull: false },
+  category: { type: DataTypes.STRING, allowNull: false },
+  amount: { type: DataTypes.FLOAT, allowNull: false },
+  description: { type: DataTypes.STRING },
+  date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
 });
 
-export default mongoose.model('Transaction', TransactionSchema);
+Transaction.belongsTo(User, { foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+User.hasMany(Transaction);
+
+export default Transaction;
