@@ -1,9 +1,14 @@
-import mongoose from 'mongoose';
 
-const BudgetSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  category: { type: String, required: true,unique:true },
-  amount: { type: Number, required: true },
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
+import User from './User.js';
+
+const Budget = sequelize.define('Budget', {
+  category: { type: DataTypes.STRING, allowNull: false, unique: true },
+  amount: { type: DataTypes.FLOAT, allowNull: false },
 });
 
-export default mongoose.model('Budget', BudgetSchema);
+Budget.belongsTo(User, { foreignKey: { allowNull: false }, onDelete: 'CASCADE' });
+User.hasMany(Budget);
+
+export default Budget;
