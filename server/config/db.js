@@ -1,5 +1,10 @@
-
 import { Sequelize } from 'sequelize';
+
+if (!process.env.PG_URI) {
+  throw new Error('PG_URI environment variable is not set. Please set it in your environment or .env file.');
+}
+
+console.log('PG_URI:', process.env.PG_URI);
 
 const sequelize = new Sequelize(process.env.PG_URI, {
   dialect: 'postgres',
