@@ -13,7 +13,10 @@ const sequelize = PG_URI
       dialect: 'postgres',
       logging: false,
       dialectOptions: {
-        ssl: false, // explicitly disable SSL
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, // Required for some cloud environments
+        },
       },
     })
   : null;
