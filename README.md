@@ -17,13 +17,13 @@ A modern, user-friendly web application designed to help individuals manage thei
 
 ## 🚀 Live Demo
 
-👉 [Live Preview](https://personal-finance-manager-nine.vercel.app)
+
 
 ---
 
 ## 📂 GitHub Repository
 
-📁 [GitHub Repo](https://github.com/ThilinaJayamal/Personal-Finance-Manager)
+
 
 ---
 
@@ -31,18 +31,9 @@ A modern, user-friendly web application designed to help individuals manage thei
 
 - **Frontend**: React, Tailwind CSS
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB
+- **Database**:postgresql
 - **Authentication**: JWT
-- **Deployment**: Vercel (Backend + Frontend)
-
----
-
-## Team Members
-
-- Thilina Jayamal ([@ThilinaJayamal](https://github.com/ThilinaJayamal))
-- Yasiru Rahul [@RahulDivyanja](https://github.com/RahulDivyanja)
-- Chamen Kalindu [@ChamenKalindu](https://github.com/ChamenKalindu)
-- Nishmika Nuran [@nishmikaeka](https://github.com/nishmikaeka)
+- **Deployment**: 
 
 ---
 
@@ -51,5 +42,3 @@ A modern, user-friendly web application designed to help individuals manage thei
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/personal-finance-manager.git
-cd personal-finance-manager
