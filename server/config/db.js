@@ -11,8 +11,7 @@ const sequelize = new Sequelize(PG_URI, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: true,
-      ca: fs.readFileSync('./certs/supabase.crt'), // path to your certificate
+      rejectUnauthorized: false, // Set to false to allow self-signed certificates
     },
   },
 });
