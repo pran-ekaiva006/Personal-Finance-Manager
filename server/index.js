@@ -10,7 +10,7 @@ import connectDB, { sequelize } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
-import goalRoutes from './routes/goalRoutes.js';
+
 import auth from './middleware/authMiddleware.js';
 
 const startServer = async () => {
