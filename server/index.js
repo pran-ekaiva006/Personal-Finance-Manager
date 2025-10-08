@@ -25,23 +25,18 @@ const startServer = async () => {
 
   const app = express();
 
-  // ✅ CORS (must be first)
+  // ✅ CORS (allow localhost and live frontend)
   const whitelist = [
     'http://localhost:5173',
-    'http://127.0.0.1:5173', // Add this for local development
+    'http://127.0.0.1:5173', // Local development
+    'https://personal-finance-manager1.onrender.com', // Live frontend
   ];
   app.use(
     cors({
       origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        if (whitelist.includes(origin)) {
-          return callback(null, true);
-        } else {
-          // Explicitly reject the request by passing an error
-          return callback(new Error('Not allowed by CORS'));
-        }
+        if (!origin) return callback(null, true); // allow mobile apps or curl
+        if (whitelist.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
       },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -49,11 +44,11 @@ const startServer = async () => {
     })
   );
 
-  // ✅ Basic middleware
+  // ✅ Middleware
   app.use(express.json());
   app.use(cookieParser());
 
-  // ✅ Request logger (after CORS)
+  // ✅ Request logger
   app.use((req, res, next) => {
     console.log('[REQ]', req.method, req.originalUrl, 'Origin:', req.headers.origin || '(no origin)');
     console.log('[COOKIES]', req.cookies);
@@ -64,7 +59,7 @@ const startServer = async () => {
   app.use('/api/auth', authRoutes);
   app.use('/api/transactions', auth, transactionRoutes);
   app.use('/api/budgets', auth, budgetRoutes);
-  app.use('/api/goals', auth, goalRoutes);
+  // goalRoutes removed
 
   // ✅ Default route
   app.get('/', (req, res) => res.send('API is running'));
