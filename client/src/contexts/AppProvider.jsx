@@ -245,22 +245,3 @@ function AppProvider({ children }) {
 export default AppProvider;
 export const useAppContext = () => useContext(AppContext);
 
-// safer dev CORS: allow all origins in development to avoid whitelist mismatch
-app.use(
-  cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? (origin, callback) => {
-          // production: restrict to whitelist
-          const whitelist = [
-            'https://personal-finance-manager-nine.vercel.app',
-            // add your production origins
-          ];
-          if (!origin) return callback(null, true);
-          return callback(null, whitelist.includes(origin));
-        }
-      : true, // development: echo origin and allow credentials
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    credentials: true,
-  })
-);

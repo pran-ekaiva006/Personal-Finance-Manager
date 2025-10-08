@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing');
 
 import express from 'express';
 import cors from 'cors';
@@ -23,33 +24,23 @@ const startServer = async () => {
 
   const app = express();
 
-  // simple request logger to help debug incoming requests
-  app.use((req, res, next) => {
-    console.log('[REQ]', req.method, req.originalUrl, 'Origin:', req.headers.origin || '(no origin)');
-    next();
-  });
-
-  // parse JSON bodies before anything else
-  app.use(express.json());
-
-  // parse cookies for auth middleware
-  app.use(cookieParser());
-
-  // Replace your current app.use(cors(...)) with this:
+  // ✅ CORS (must be first)
   const whitelist = [
     'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'https://personal-finance-manager-nine.vercel.app'
+    'http://127.0.0.1:5173', // Add this for local development
   ];
-
-  // safer dev CORS: return boolean true/false (cors will echo origin when credentials: true)
   app.use(
     cors({
       origin: (origin, callback) => {
-        // allow non-browser requests (no origin)
+        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (whitelist.includes(origin)) return callback(null, true);
-        return callback(null, false);
+
+        if (whitelist.includes(origin)) {
+          return callback(null, true);
+        } else {
+          // Explicitly reject the request by passing an error
+          return callback(new Error('Not allowed by CORS'));
+        }
       },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -57,20 +48,15 @@ const startServer = async () => {
     })
   );
 
-  // Do NOT add app.options('/*', ...) or app.options('*', ...) — that triggers path-to-regexp in this environment.
+  // ✅ Basic middleware
+  app.use(express.json());
+  app.use(cookieParser());
 
-  // small error middleware to convert CORS "not allowed" into 403 rather than crashing
-  app.use((err, req, res, next) => {
-    if (err && /cors/i.test(err.message)) {
-      return res.status(403).json({ message: 'CORS blocked: origin not allowed' });
-    }
-    next(err);
-  });
-
-  // catch-all express error handler (ensure it's after routes if you want to see route errors)
-  app.use((err, req, res, next) => {
-    console.error('Express error handler:', err && err.stack ? err.stack : err);
-    res.status(500).json({ message: 'Server error' });
+  // ✅ Request logger (after CORS)
+  app.use((req, res, next) => {
+    console.log('[REQ]', req.method, req.originalUrl, 'Origin:', req.headers.origin || '(no origin)');
+    console.log('[COOKIES]', req.cookies);
+    next();
   });
 
   // ✅ Routes
@@ -78,16 +64,27 @@ const startServer = async () => {
   app.use('/api/transactions', auth, transactionRoutes);
   app.use('/api/budgets', auth, budgetRoutes);
 
-  // ✅ Default route (optional)
+  // ✅ Default route
   app.get('/', (req, res) => res.send('API is running'));
 
-  const PORT = process.env.PORT || 5000;
+  // ✅ Error handling
+  app.use((err, req, res, next) => {
+    if (err && err.message === 'Not allowed by CORS') {
+      console.error('CORS Error: Origin not allowed ->', req.headers.origin);
+      return res.status(403).json({ message: 'CORS blocked: This origin is not allowed.' });
+    }
+    console.error('Express error handler:', err && err.stack ? err.stack : err);
+    res.status(500).json({ message: 'Server error' });
+  });
+
+  const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 };
 
+// ✅ Start server
 startServer();
 
-// process-level handlers to log unexpected crashes
+// ✅ Process-level crash handlers
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err && err.stack ? err.stack : err);
   process.exit(1);

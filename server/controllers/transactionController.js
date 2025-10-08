@@ -1,4 +1,5 @@
 import Transaction from '../models/Transaction.js';
+import { Op } from 'sequelize';
 
 
 export const addTransaction = async (req, res) => {
@@ -31,7 +32,7 @@ export const getMonthlySummary = async (req, res) => {
     const transactions = await Transaction.findAll({
       where: {
         UserId: req.user.id,
-        date: { $gte: start, $lte: end }
+        date: { [Op.gte]: start, [Op.lte]: end }
       }
     });
 
@@ -79,8 +80,8 @@ export const getMonthlyIncomeExpenseSummary = async (req, res) => {
       where: {
         UserId: userId,
         date: {
-          $gte: new Date(currentYear, 0, 1),
-          $lte: new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999),
+          [Op.gte]: new Date(currentYear, 0, 1),
+          [Op.lte]: new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999),
         }
       }
     });

@@ -1,5 +1,7 @@
 import Budget from '../models/Budget.js';
 import Transaction from '../models/Transaction.js';
+import { Op } from 'sequelize';
+import { sequelize } from '../config/db.js';
 
 
 export const addBudget = async (req, res) => {
@@ -42,10 +44,11 @@ export const updateBudget = async (req, res) => {
 export const deleteBudget = async (req, res) => {
   try {
     const { id } = req.params;
-    const budget = await Budget.findOneAndDelete({ _id: id, user: req.user._id });
+    const budget = await Budget.findOne({ where: { id, UserId: req.user.id } });
 
     if (!budget) return res.status(404).json({ message: 'Budget not found' });
 
+    await budget.destroy();
     res.status(200).json({ message: 'Budget deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });
@@ -60,33 +63,30 @@ export const getBudgetUsageThisMonth = async (req, res) => {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth(); // 0-based
-
     const startOfMonth = new Date(year, month, 1);
-    const endOfMonth = new Date(year, month + 1, 1);
+    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
-    // Fetch all budgets
-    const budgets = await Budget.find({ user: req.user._id });
+    // Fetch all budgets for the user
+    const budgets = await Budget.findAll({ where: { UserId: req.user.id } });
 
     // Get expenses by category this month
-    const expenseAgg = await Transaction.aggregate([
-      {
-        $match: {
-          user: req.user._id,
-          type: 'Expense',
-          date: { $gte: startOfMonth, $lt: endOfMonth },
-        }
+    const expenses = await Transaction.findAll({
+      where: {
+        UserId: req.user.id,
+        type: 'Expense',
+        date: {
+          [Op.gte]: startOfMonth,
+          [Op.lte]: endOfMonth,
+        },
       },
-      {
-        $group: {
-          _id: '$category',
-          totalSpent: { $sum: '$amount' }
-        }
-      }
-    ]);
+      attributes: ['category', [sequelize.fn('SUM', sequelize.col('amount')), 'totalSpent']],
+      group: ['category'],
+      raw: true,
+    });
 
     const expenseMap = {};
-    expenseAgg.forEach((e) => {
-      expenseMap[e._id] = e.totalSpent;
+    expenses.forEach((e) => {
+      expenseMap[e.category] = parseFloat(e.totalSpent);
     });
 
     // Per-category report
