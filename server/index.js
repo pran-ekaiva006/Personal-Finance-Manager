@@ -10,7 +10,6 @@ import connectDB, { sequelize } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
-
 import auth from './middleware/authMiddleware.js';
 
 const startServer = async () => {
@@ -25,7 +24,7 @@ const startServer = async () => {
 
   const app = express();
 
-  // ✅ CORS (allow localhost and live frontend)
+  // ✅ CORS (allow localhost and Render frontend)
   const whitelist = [
     'http://localhost:5173',
     'http://127.0.0.1:5173', // Local development
