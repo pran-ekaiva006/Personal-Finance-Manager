@@ -10,6 +10,7 @@ import connectDB, { sequelize } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
+import goalRoutes from './routes/goalRoutes.js';
 import auth from './middleware/authMiddleware.js';
 
 const startServer = async () => {
@@ -63,6 +64,7 @@ const startServer = async () => {
   app.use('/api/auth', authRoutes);
   app.use('/api/transactions', auth, transactionRoutes);
   app.use('/api/budgets', auth, budgetRoutes);
+  app.use('/api/goals', auth, goalRoutes);
 
   // ✅ Default route
   app.get('/', (req, res) => res.send('API is running'));
