@@ -26,15 +26,38 @@ const startServer = async () => {
 
   // ✅ CORS (allow localhost and Render frontend)
   const whitelist = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173', // Local development
     'https://personal-finance-manager1.onrender.com', // Live frontend
+    'http://localhost:5174',
+    'http://127.0.0.1:5174',
   ];
+
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // allow mobile apps or curl
-        if (whitelist.includes(origin)) return callback(null, true);
+        // allow non-browser requests (curl, Postman, mobile apps)
+        if (!origin) {
+          console.log('CORS: no origin (allowing)');
+          return callback(null, true);
+        }
+
+        // quick whitelist check
+        if (whitelist.includes(origin)) {
+          console.log('CORS: origin allowed (whitelist) ->', origin);
+          return callback(null, true);
+        }
+
+        // allow any localhost/127.0.0.1 port for dev
+        try {
+          const u = new URL(origin);
+          if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
+            console.log('CORS: origin allowed (localhost) ->', origin);
+            return callback(null, true);
+          }
+        } catch (e) {
+          // malformed origin
+        }
+
+        console.warn('CORS: origin rejected ->', origin);
         return callback(new Error('Not allowed by CORS'));
       },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
