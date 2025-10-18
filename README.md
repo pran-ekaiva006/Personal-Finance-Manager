@@ -34,26 +34,25 @@
 
 ### **About The Project**
 
-**Personal Finance Manager** is a full-stack web application that helps users **track their income, expenses, and budgets** in one place.  
-It offers **data visualization, secure authentication**, and a **responsive dashboard** to make financial management easier and smarter.  
+**Personal Finance Manager** is a full-stack web application designed to help users efficiently **track income, expenses, and budgets**.  
+It offers **real-time visual insights** and **secure authentication** through a clean, modern, and responsive dashboard.
 
-Users can:
-- Add transactions
-- Manage budgets
-- View analytics and insights
-- Track overall financial performance
+Built with **React (Vite)** on the frontend and **Node.js + Express** on the backend, the application stores data in a **PostgreSQL database powered by Supabase**, ensuring reliability and scalability.  
+
+Both the **frontend and backend are deployed on Render**, making the app easily accessible online.
 
 ---
 
 ### **Features**
 
-- 🔐 User authentication (JWT-based)
-- 💰 Add, edit, and delete income/expense transactions
-- 📊 Interactive charts to visualize spending
-- 🎯 Set and manage category-based budgets
-- 💡 Dynamic dashboard with financial insights
-- 📱 Fully responsive and mobile-friendly UI
-- ☁️ Deployed on Render (Backend) and Vercel (Frontend)
+- 🔐 Secure authentication using Supabase (PostgreSQL)
+- 💰 Add, edit, and delete income or expense transactions
+- 🎯 Set and manage personalized budgets
+- 📊 Visual analytics with Pie and Line charts
+- 📆 Transaction history and category insights
+- 💡 Dashboard summary of total balance and trends
+- ☁️ Hosted entirely on Render (Frontend + Backend)
+- 📱 Fully responsive design with Tailwind CSS
 
 ---
 
@@ -64,9 +63,10 @@ Users can:
   <img alt="TailwindCSS" src="https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwind-css&logoColor=white"/>
   <img alt="Node.js" src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white"/>
   <img alt="Express.js" src="https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=white"/>
-  <img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white"/>
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white"/>
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=black"/>
   <img alt="Render" src="https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black"/>
-  <img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white"/>
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white"/>
   <img alt="VS Code" src="https://img.shields.io/badge/VS%20Code-007ACC?logo=visual-studio-code&logoColor=white"/>
 </p>
 
@@ -74,9 +74,11 @@ Users can:
 
 ## **Demo**
 
-Check out the live project here: 👉 [Personal Finance Manager Live Demo](https://personal-finance-manager1.onrender.com)
+Check out the live project here:  
+👉 [**Personal Finance Manager Live Demo**](https://personal-finance-manager1.onrender.com)
 
-GitHub Repository: [Personal Finance Manager GitHub Repo](https://github.com/pran-ekaiva006/Personal-Finance-Manager)
+GitHub Repository:  
+🔗 [**Personal Finance Manager Repo**](https://github.com/pran-ekaiva006/Personal-Finance-Manager)
 
 ---
 
@@ -85,3 +87,58 @@ GitHub Repository: [Personal Finance Manager GitHub Repo](https://github.com/pra
 ### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/pran-ekaiva006/Personal-Finance-Manager.git
+
+---
+
+## **Folder-Structure**
+Personal-Finance-Manager/
+├── .gitignore
+├── README.md
+├── client
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── public
+│   │   ├── logo.png
+│   │   └── vite.svg
+│   └── src
+│       ├── App.jsx
+│       ├── index.css
+│       ├── main.jsx
+│       ├── components
+│       │   ├── BudgetCardDisplay.jsx
+│       │   ├── MoneyCard.jsx
+│       │   ├── TransactionCard.jsx
+│       │   ├── SkeletonLoader.jsx
+│       │   └── PieChart.jsx
+│       ├── pages
+│       │   ├── Login.jsx
+│       │   └── UserLayout.jsx
+│       ├── sections
+│       │   ├── Dashboard.jsx
+│       │   ├── Budgets.jsx
+│       │   ├── SetBudgets.jsx
+│       │   ├── AddTransaction.jsx
+│       │   └── Transactions.jsx
+│       └── contexts
+│           └── AppProvider.jsx
+│
+└── server
+    ├── app.js
+    ├── index.js
+    ├── package.json
+    ├── config
+    │   └── db.js
+    ├── controllers
+    │   ├── authController.js
+    │   ├── budgetController.js
+    │   └── transactionController.js
+    ├── routes
+    │   ├── authRoutes.js
+    │   ├── budgetRoutes.js
+    │   └── transactionRoutes.js
+    └── certs
+        └── supabase.crt
+
+
+### **📜 Licence**
