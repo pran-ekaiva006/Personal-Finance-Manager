@@ -27,8 +27,8 @@
 - [🛠️ Tech Stack](#tech-stack)
 - [🎪 Demo](#demo)
 - [🔧 Installation](#installation)
-- [📂 Folder Structure](#-folder-structure)
-- [📜 Licence](#licence)
+- [📂 Folder Structure](#folder-structure)
+- [📜 License](#license)
 
 ---
 
@@ -85,60 +85,101 @@ GitHub Repository:
 ## **Installation**
 
 ### 1️⃣ Clone the Repository
+
 ```bash
 git clone https://github.com/pran-ekaiva006/Personal-Finance-Manager.git
+cd Personal-Finance-Manager
+```
+
+### 2️⃣ Install Dependencies
+
+#### Backend
+
+```bash
+cd server
+npm install
+```
+
+#### Frontend
+
+```bash
+cd ../client
+npm install
+```
+
+### 3️⃣ Run the Application
+
+#### Backend
+
+```bash
+cd server
+npm start
+```
+
+#### Frontend
+
+```bash
+cd client
+npm run dev
+```
 
 ---
 
-## **Folder-Structure**
+## 📂 Folder Structure
+
+```bash
 Personal-Finance-Manager/
 ├── .gitignore
 ├── README.md
-├── client
+├── client/
 │   ├── index.html
 │   ├── package.json
 │   ├── vite.config.js
-│   ├── public
+│   ├── public/
 │   │   ├── logo.png
 │   │   └── vite.svg
-│   └── src
+│   └── src/
 │       ├── App.jsx
 │       ├── index.css
 │       ├── main.jsx
-│       ├── components
+│       ├── components/
 │       │   ├── BudgetCardDisplay.jsx
 │       │   ├── MoneyCard.jsx
 │       │   ├── TransactionCard.jsx
 │       │   ├── SkeletonLoader.jsx
 │       │   └── PieChart.jsx
-│       ├── pages
+│       ├── pages/
 │       │   ├── Login.jsx
 │       │   └── UserLayout.jsx
-│       ├── sections
+│       ├── sections/
 │       │   ├── Dashboard.jsx
 │       │   ├── Budgets.jsx
 │       │   ├── SetBudgets.jsx
 │       │   ├── AddTransaction.jsx
 │       │   └── Transactions.jsx
-│       └── contexts
+│       └── contexts/
 │           └── AppProvider.jsx
 │
-└── server
+└── server/
     ├── app.js
     ├── index.js
     ├── package.json
-    ├── config
+    ├── config/
     │   └── db.js
-    ├── controllers
+    ├── controllers/
     │   ├── authController.js
     │   ├── budgetController.js
     │   └── transactionController.js
-    ├── routes
+    ├── routes/
     │   ├── authRoutes.js
     │   ├── budgetRoutes.js
     │   └── transactionRoutes.js
-    └── certs
+    └── certs/
         └── supabase.crt
+```
 
+---
 
-### **📜 Licence**
+## 📜 License
+
+This Project is Licensed under the MIT License, see [LICENSE](./LICENSE) for details
