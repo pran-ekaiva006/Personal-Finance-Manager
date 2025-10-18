@@ -26,7 +26,7 @@ const startServer = async () => {
 
   // ✅ CORS (allow localhost and Render frontend)
   const whitelist = [
-   'https://dashboard.render.com/static/srv-d3j9eevdiees73cc61u0', // Live frontend
+    'https://personal-finance-manager1.onrender.com', // Live frontend
     'http://localhost:5174',
     'http://127.0.0.1:5174',
   ];
