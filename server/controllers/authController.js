@@ -7,16 +7,14 @@ const generateToken = (id) => {
   });
 };
 
-const getCookieOptions = () => {
-  const isProduction = process.env.NODE_ENV === "production";
+const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",   // HTTPS only on Render
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  path: "/",                                       // Required for Chrome
+  maxAge: 30 * 24 * 60 * 60 * 1000,                // 30 days
+});
 
-  return {
-    httpOnly: true,
-    secure: isProduction,                              // Required for HTTPS (Render)
-    sameSite: isProduction ? "none" : "lax",           // Allow cross-site cookies
-    maxAge: 30 * 24 * 60 * 60 * 1000,                  // 30 days
-  };
-};
 
 // ✅ REGISTER
 export const register = async (req, res) => {
@@ -28,17 +26,14 @@ export const register = async (req, res) => {
 
     const user = await User.create({ name, email, password });
 
-    res.cookie("token", generateToken(user.id), {
-      ...getCookieOptions(),
-      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
-      path: "/",                                       // 🔥 REQUIRED FOR CHROME
-    });
+    res.cookie("token", generateToken(user.id), getCookieOptions());
 
     res.status(201).json({ id: user.id, name: user.name, email: user.email });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 // ✅ LOGIN
 export const login = async (req, res) => {
@@ -47,11 +42,7 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (user && (await user.matchPassword(password))) {
-      res.cookie("token", generateToken(user.id), {
-        ...getCookieOptions(),
-        domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
-        path: "/",                                     // 🔥 REQUIRED FOR CHROME
-      });
+      res.cookie("token", generateToken(user.id), getCookieOptions());
 
       return res.json({ id: user.id, name: user.name, email: user.email });
     }
@@ -62,20 +53,17 @@ export const login = async (req, res) => {
   }
 };
 
+
 // ✅ LOGOUT
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      ...getCookieOptions(),
-      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
-      path: "/",                                       // Required to delete cookie
-    });
-
+    res.clearCookie("token", getCookieOptions());
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 // ✅ CURRENT USER
 export const getCurrentUser = async (req, res) => {
