@@ -12,12 +12,13 @@ const getCookieOptions = () => {
 
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    secure: isProduction,                              // Required for HTTPS (Render)
+    sameSite: isProduction ? "none" : "lax",           // Allow cross-site cookies
+    maxAge: 30 * 24 * 60 * 60 * 1000,                  // 30 days
   };
 };
 
+// ✅ REGISTER
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -27,38 +28,56 @@ export const register = async (req, res) => {
 
     const user = await User.create({ name, email, password });
 
-    res.cookie("token", generateToken(user.id), getCookieOptions());
+    res.cookie("token", generateToken(user.id), {
+      ...getCookieOptions(),
+      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
+      path: "/",                                       // 🔥 REQUIRED FOR CHROME
+    });
+
     res.status(201).json({ id: user.id, name: user.name, email: user.email });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
 };
 
+// ✅ LOGIN
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ where: { email } });
     if (user && (await user.matchPassword(password))) {
-      res.cookie("token", generateToken(user.id), getCookieOptions());
-      res.json({ id: user.id, name: user.name, email: user.email });
-    } else {
-      res.status(401).json({ message: "Invalid credentials" });
+      res.cookie("token", generateToken(user.id), {
+        ...getCookieOptions(),
+        domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
+        path: "/",                                     // 🔥 REQUIRED FOR CHROME
+      });
+
+      return res.json({ id: user.id, name: user.name, email: user.email });
     }
+
+    res.status(401).json({ message: "Invalid credentials" });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
 };
 
+// ✅ LOGOUT
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", getCookieOptions());
+    res.clearCookie("token", {
+      ...getCookieOptions(),
+      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
+      path: "/",                                       // Required to delete cookie
+    });
+
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server Error" });
   }
 };
 
+// ✅ CURRENT USER
 export const getCurrentUser = async (req, res) => {
   try {
     const user = req.user;
