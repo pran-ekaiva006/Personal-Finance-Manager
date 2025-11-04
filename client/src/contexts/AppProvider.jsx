@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
 const AppContext = createContext();
 
-// ✅ Backend URL from .env
+// ✅ Backend URL from .env MUST end with /api/
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 axios.defaults.withCredentials = true;
 
@@ -43,18 +43,14 @@ function AppProvider({ children }) {
     },
   });
   const [transactions, setTransactions] = useState([]);
-  const [expenseCategory, setExpenseCategory] = useState(
-    defaultExpenseCategories
-  );
 
+  const [expenseCategory, setExpenseCategory] = useState(defaultExpenseCategories);
   const navigate = useNavigate();
 
   // ---------- Auth ----------
   const register = async (formData) => {
     try {
-      const { data } = await axios.post("/api/auth/register", formData, {
-        withCredentials: true,
-      });
+      const { data } = await axios.post("auth/register", formData);
       setUser(data);
       toast.success("Registered successfully");
       navigate("/");
@@ -65,9 +61,7 @@ function AppProvider({ children }) {
 
   const login = async (formData) => {
     try {
-      const { data } = await axios.post("/api/auth/login", formData, {
-        withCredentials: true,
-      });
+      const { data } = await axios.post("auth/login", formData);
       setUser(data);
       toast.success("Logged in successfully");
       navigate("/");
@@ -78,13 +72,7 @@ function AppProvider({ children }) {
 
   const logout = async () => {
     try {
-      const { data } = await axios.post(
-        "/api/auth/logout",
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      const { data } = await axios.post("auth/logout");
       setUser(null);
       toast.success(data?.message);
       navigate("/login");
@@ -95,13 +83,9 @@ function AppProvider({ children }) {
 
   const loadUser = async () => {
     try {
-      const res = await axios.get("/api/auth/me");
+      const res = await axios.get("auth/me");
       setUser(res.data);
-
-      if (
-        window.location.pathname === "/login" ||
-        window.location.pathname === "/register"
-      ) {
+      if (window.location.pathname === "/login" || window.location.pathname === "/register") {
         navigate("/");
       }
     } catch {
@@ -113,7 +97,7 @@ function AppProvider({ children }) {
   // ---------- Transactions ----------
   const addTransaction = async (transaction) => {
     try {
-      await axios.post("/api/transactions", transaction);
+      await axios.post("transactions", transaction);
       await fetchMonthlySummary();
       await getTransactions();
       toast.success("Transaction added");
@@ -124,7 +108,7 @@ function AppProvider({ children }) {
 
   const getTransactions = async () => {
     try {
-      const { data } = await axios.get("/api/transactions");
+      const { data } = await axios.get("transactions");
       setTransactions(data);
     } catch {
       return [];
@@ -133,7 +117,7 @@ function AppProvider({ children }) {
 
   const deleteTransaction = async (id) => {
     try {
-      await axios.delete(`/api/transactions/${id}`);
+      await axios.delete(`transactions/${id}`);
       toast.success("Transaction deleted");
     } catch {
       toast.error("Delete transaction failed");
@@ -145,9 +129,7 @@ function AppProvider({ children }) {
       const now = new Date();
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
-      const { data } = await axios.get(
-        `/api/transactions/summary/${year}/${month}`
-      );
+      const { data } = await axios.get(`transactions/summary/${year}/${month}`);
       setStatistic(data);
     } catch {
       return null;
@@ -156,7 +138,7 @@ function AppProvider({ children }) {
 
   const fetchSummary = async () => {
     try {
-      const { data } = await axios.get("/api/transactions/monthly-summary");
+      const { data } = await axios.get("transactions/monthly-summary");
       setYearData(data);
     } catch {
       return null;
@@ -166,7 +148,7 @@ function AppProvider({ children }) {
   // ---------- Budgets ----------
   const addBudget = async (budget) => {
     try {
-      await axios.post("/api/budgets", budget);
+      await axios.post("budgets", budget);
       toast.success("Budget added");
     } catch {
       toast.error("Add budget failed");
@@ -175,16 +157,11 @@ function AppProvider({ children }) {
 
   const getBudgets = async () => {
     try {
-      const { data } = await axios.get("/api/budgets");
+      const { data } = await axios.get("budgets");
       setBudgets(data || []);
-
-      if (data) {
-        const used = data.map((item) => item.category);
-        const available = defaultExpenseCategories.filter(
-          (cat) => !used.includes(cat)
-        );
-        setExpenseCategory(available);
-      }
+      const used = data.map((i) => i.category);
+      const available = defaultExpenseCategories.filter((cat) => !used.includes(cat));
+      setExpenseCategory(available);
     } catch {
       return null;
     }
@@ -192,7 +169,7 @@ function AppProvider({ children }) {
 
   const updateBudget = async (id, updates) => {
     try {
-      await axios.put(`/api/budgets/${id}`, updates);
+      await axios.put(`budgets/${id}`, updates);
       await getBudgets();
       toast.success("Budget updated");
     } catch {
@@ -202,7 +179,7 @@ function AppProvider({ children }) {
 
   const deleteBudget = async (id) => {
     try {
-      await axios.delete(`/api/budgets/${id}`);
+      await axios.delete(`budgets/${id}`);
       await getBudgets();
       toast.success("Budget deleted");
     } catch {
@@ -212,7 +189,7 @@ function AppProvider({ children }) {
 
   const getBudgetUsage = async () => {
     try {
-      const { data } = await axios.get("/api/budgets/status");
+      const { data } = await axios.get("budgets/status");
       setBudgetUsage(data);
     } catch {
       return null;
@@ -225,20 +202,16 @@ function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
     const fetchData = async () => {
-      try {
-        await getBudgets();
-        await fetchMonthlySummary();
-        await fetchSummary();
-        await getBudgetUsage();
-        await getTransactions();
-        setLoading(false);
-      } catch {
-        return null;
-      }
+      await getBudgets();
+      await fetchMonthlySummary();
+      await fetchSummary();
+      await getBudgetUsage();
+      await getTransactions();
+      setLoading(false);
     };
-
-    if (user) fetchData();
+    fetchData();
   }, [user]);
 
   return (
