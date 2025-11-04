@@ -16,7 +16,7 @@ const startServer = async () => {
 
   try {
     await sequelize.sync();
-    console.log("✅ All models were synchronized successfully.");
+    console.log("✅ DB Synced Successfully");
   } catch (err) {
     console.error("❌ Sequelize sync error:", err);
     process.exit(1);
@@ -24,7 +24,7 @@ const startServer = async () => {
 
   const app = express();
 
-  // Required For Cookies on Render
+  // Required on Render for cookies
   app.set("trust proxy", 1);
 
   const allowedOrigins = [
@@ -32,56 +32,54 @@ const startServer = async () => {
     "http://localhost:5173",
   ];
 
-  // ✅ Universal CORS header for ALL requests
-  app.use((req, res, next) => {
+  // ✅ CORS Middleware (Only this — no duplicates)
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          console.log("❌ CORS BLOCKED:", origin);
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+  );
+
+  // ✅ Fix EXPRESS v5 wildcard issue
+  app.options("*", (req, res) => {
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
     }
-
     res.header("Access-Control-Allow-Credentials", "true");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Requested-With"
-    );
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(204); // STOP HERE — do NOT continue to routes
-    }
-
-    next();
+    return res.sendStatus(204);
   });
-
-  // ✅ cors() (must come AFTER manual headers)
-  app.use(
-    cors({
-      origin: allowedOrigins,
-      credentials: true,
-    })
-  );
 
   app.use(express.json());
   app.use(cookieParser());
 
-  // Debug logs
+  // Debug logs (remove if needed)
   app.use((req, res, next) => {
     console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
     console.log("[COOKIES]", req.cookies);
     next();
   });
 
-  // ✅ Routes
+  // API Routes
   app.use("/api/auth", authRoutes);
   app.use("/api/transactions", transactionRoutes);
   app.use("/api/budgets", budgetRoutes);
 
-  app.get("/", (req, res) => res.send("API is running ✅"));
+  app.get("/", (req, res) => res.send("Backend Live ✅"));
 
   const PORT = process.env.PORT || 5001;
-  app.listen(PORT, () =>
-    console.log(`🚀 Backend running on port ${PORT}`)
-  );
+  app.listen(PORT, () => console.log(`🚀 Backend running on ${PORT}`));
 };
 
 startServer();
