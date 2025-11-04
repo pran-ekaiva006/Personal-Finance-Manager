@@ -28,43 +28,20 @@ const startServer = async () => {
   const whitelist = [
     'https://personal-finance-manager1.onrender.com', // Live frontend
     'http://localhost:5174',
-    'http://127.0.0.1:5174',
   ];
 
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        // allow non-browser requests (curl, Postman, mobile apps)
-        if (!origin) {
-          console.log('CORS: no origin (allowing)');
-          return callback(null, true);
-        }
+  const corsOptions = {
+    origin: (origin, callback) => {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  };
 
-        // quick whitelist check
-        if (whitelist.includes(origin)) {
-          console.log('CORS: origin allowed (whitelist) ->', origin);
-          return callback(null, true);
-        }
-
-        // allow any localhost/127.0.0.1 port for dev
-        try {
-          const u = new URL(origin);
-          if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') {
-            console.log('CORS: origin allowed (localhost) ->', origin);
-            return callback(null, true);
-          }
-        } catch (e) {
-          // malformed origin
-        }
-
-        console.warn('CORS: origin rejected ->', origin);
-        return callback(new Error('Not allowed by CORS'));
-      },
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-      credentials: true,
-    })
-  );
+  app.use(cors(corsOptions));
 
   // ✅ Middleware
   app.use(express.json());
