@@ -47,7 +47,7 @@ const startServer = async () => {
 
   // ✅ Global OPTIONS preflight handler
   // This should be the first middleware to ensure all preflight requests are handled.
-  app.options('*', cors(corsOptions));
+  // app.options('*', cors(corsOptions)); // REMOVE THIS LINE - It is causing the server to crash.
 
   app.use(cors(corsOptions));
 
