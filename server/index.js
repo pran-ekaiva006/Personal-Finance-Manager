@@ -1,30 +1,30 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Missing');
+console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Loaded" : "Missing");
 
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
-import connectDB, { sequelize } from './config/db.js';
-import authRoutes from './routes/authRoutes.js';
-import transactionRoutes from './routes/transactionRoutes.js';
-import budgetRoutes from './routes/budgetRoutes.js';
+import connectDB, { sequelize } from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import transactionRoutes from "./routes/transactionRoutes.js";
+import budgetRoutes from "./routes/budgetRoutes.js";
 
 const startServer = async () => {
   await connectDB();
 
   try {
     await sequelize.sync();
-    console.log('✅ All models were synchronized successfully.');
+    console.log("✅ All models were synchronized successfully.");
   } catch (err) {
-    console.error('❌ Sequelize sync error:', err);
+    console.error("❌ Sequelize sync error:", err);
     process.exit(1);
   }
 
   const app = express();
 
-  // Required for cookies to work on Render
+  // ✅ Required for trusted proxies (Render)
   app.set("trust proxy", 1);
 
   // ✅ Allowed frontend URLs
@@ -33,41 +33,38 @@ const startServer = async () => {
     "http://localhost:5173",
   ];
 
-  const corsOptions = {
-    origin: (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error("❌ CORS Blocked Origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  };
-
-  // ✅ CORS must be BEFORE JSON and routes
-  app.use(cors(corsOptions));
-
   /**
-   * ✅ EXPRESS 5 FIX (NO wildcard allowed)
-   * Handle all OPTIONS requests manually to avoid crashing path-to-regexp.
+   * ✅ CORS must be applied BEFORE routes & JSON parsing
    */
   app.use((req, res, next) => {
-    if (req.method === "OPTIONS") {
-      res.header("Access-Control-Allow-Origin", req.headers.origin);
-      res.header("Access-Control-Allow-Credentials", "true");
-      res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      return res.sendStatus(204);
-    }
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
   });
 
-  // ✅ Middleware
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || whitelist.includes(origin)) {
+          callback(null, true);
+        } else {
+          console.log("❌ CORS blocked:", origin);
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+  );
+
+  // ✅ Respond to ALL preflight OPTIONS requests
+  app.options("*", cors());
+
+  // ✅ Middlewares
   app.use(express.json());
   app.use(cookieParser());
 
-  // Debug logs
+  // ✅ Debug logging (remove later if needed)
   app.use((req, res, next) => {
     console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
     console.log("[COOKIES]", req.cookies);
@@ -80,9 +77,9 @@ const startServer = async () => {
   app.use("/api/budgets", budgetRoutes);
 
   // ✅ Default route
-  app.get("/", (req, res) => res.send("API is running"));
+  app.get("/", (req, res) => res.send("API is running ✅"));
 
-  // ✅ Error handling
+  // ✅ Error handler
   app.use((err, req, res, next) => {
     if (err && err.message === "Not allowed by CORS") {
       return res.status(403).json({ message: "CORS blocked: Origin not allowed" });
@@ -98,13 +95,13 @@ const startServer = async () => {
 // ✅ Start server
 startServer();
 
-// ✅ Process crash safety
+// ✅ Crash safety
 process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err.stack || err);
+  console.error("❌ Uncaught Exception:", err.stack || err);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled Rejection:", reason.stack || reason);
+  console.error("❌ Unhandled Rejection:", reason.stack || reason);
   process.exit(1);
 });
