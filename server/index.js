@@ -24,7 +24,7 @@ const startServer = async () => {
 
   const app = express();
 
-  // Required on Render for cookies
+  // Required for trusting proxy (Render HTTPS → Express HTTP)
   app.set("trust proxy", 1);
 
   const allowedOrigins = [
@@ -32,10 +32,9 @@ const startServer = async () => {
     "http://localhost:5173",
   ];
 
-  // ✅ Handle Preflight OPTIONS requests (Express v5 safe)
+  // ✅ Single CORS + Preflight middleware (no conflicting cors())
   app.use((req, res, next) => {
     const origin = req.headers.origin;
-
     if (allowedOrigins.includes(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
     }
@@ -45,31 +44,23 @@ const startServer = async () => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
     if (req.method === "OPTIONS") {
-      return res.sendStatus(204); // STOP HERE
+      return res.sendStatus(204); // ✅ Fix CORS preflight
     }
 
     next();
   });
 
-  // ✅ CORS must be BELOW the preflight middleware
-  app.use(
-    cors({
-      origin: allowedOrigins,
-      credentials: true,
-    })
-  );
-
   app.use(express.json());
   app.use(cookieParser());
 
-  // Debug logs
+  // Debug
   app.use((req, res, next) => {
     console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
     console.log("[COOKIES]", req.cookies);
     next();
   });
 
-  // ✅ Routes
+  // ✅ API Routes
   app.use("/api/auth", authRoutes);
   app.use("/api/transactions", transactionRoutes);
   app.use("/api/budgets", budgetRoutes);
