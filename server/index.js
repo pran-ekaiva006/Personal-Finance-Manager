@@ -32,6 +32,7 @@ const startServer = async () => {
 
   const corsOptions = {
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -41,6 +42,9 @@ const startServer = async () => {
     credentials: true,
   };
 
+  // Handle preflight requests across all routes
+  app.options('*', cors(corsOptions)); 
+  
   app.use(cors(corsOptions));
 
   // ✅ Middleware
@@ -56,9 +60,8 @@ const startServer = async () => {
 
   // ✅ Routes
   app.use('/api/auth', authRoutes);
-  app.use('/api/transactions', auth, transactionRoutes);
-  app.use('/api/budgets', auth, budgetRoutes);
-  // goalRoutes removed
+  app.use('/api/transactions', transactionRoutes);
+  app.use('/api/budgets', budgetRoutes);
 
   // ✅ Default route
   app.get('/', (req, res) => res.send('API is running'));
