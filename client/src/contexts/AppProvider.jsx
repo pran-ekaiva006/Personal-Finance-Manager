@@ -25,9 +25,23 @@ function AppProvider({ children }) {
     const [user, setUser] = useState('');
     const [search, setSearch] = useState('');
     const [budgets, setBudgets] = useState([]);
-    const [statistic, setStatistic] = useState('');
+    const [statistic, setStatistic] = useState({
+        balance: 0,
+        income: 0,
+        expense: 0,
+        savingRate: 0,
+        categoryBreakdown: [],
+    });
     const [yearData, setYearData] = useState([]);
-    const [budgetUsage, setBudgetUsage] = useState([]);
+    const [budgetUsage, setBudgetUsage] = useState({
+        report: [],
+        total: {
+            totalBudget: 0,
+            totalSpent: 0,
+            remaining: 0,
+            percentUsed: 0,
+        },
+    });
     const [transactions, setTransactions] = useState([]);
 
     const [expenseCategory, setExpenseCategory] = useState(defaultExpenseCategories);
