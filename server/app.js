@@ -8,6 +8,7 @@ import budgetRoutes from './routes/budgetRoutes.js';
 
 const app = express();
 
+// --- Add CORS configuration here ---
 const allowedOrigins = [
     'https://personal-finance-manager1.onrender.com', // Your deployed frontend
     'http://localhost:5174' // Your local frontend for development
@@ -15,18 +16,18 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
     credentials: true,
 };
 
 app.use(cors(corsOptions));
+// --- End of CORS configuration ---
+
 app.use(express.json());
 app.use(cookieParser());
 
