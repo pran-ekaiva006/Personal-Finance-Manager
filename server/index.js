@@ -24,24 +24,22 @@ const startServer = async () => {
 
   const app = express();
 
-  // ✅ Required for trusted proxies (Render)
+  // ✅ Required when deploying on Render to allow cookies
   app.set("trust proxy", 1);
 
-  // ✅ Allowed frontend URLs
   const whitelist = [
     "https://personal-finance-manager1.onrender.com",
     "http://localhost:5173",
   ];
 
-  /**
-   * ✅ CORS must be applied BEFORE routes & JSON parsing
-   */
+  // ✅ Add required CORS headers before cors()
   app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
   });
 
+  // ✅ CORS Config
   app.use(
     cors({
       origin: function (origin, callback) {
@@ -57,14 +55,23 @@ const startServer = async () => {
     })
   );
 
-  // ✅ Respond to ALL preflight OPTIONS requests
-  app.options("*", cors());
+  // ✅ Express 5 Preflight handler (NO wildcard route!)
+  app.use((req, res, next) => {
+    if (req.method === "OPTIONS") {
+      res.header("Access-Control-Allow-Origin", req.headers.origin);
+      res.header("Access-Control-Allow-Credentials", "true");
+      res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      return res.sendStatus(204);
+    }
+    next();
+  });
 
-  // ✅ Middlewares
+  // ✅ Middleware
   app.use(express.json());
   app.use(cookieParser());
 
-  // ✅ Debug logging (remove later if needed)
+  // Debug logs (optional)
   app.use((req, res, next) => {
     console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
     console.log("[COOKIES]", req.cookies);
@@ -79,9 +86,9 @@ const startServer = async () => {
   // ✅ Default route
   app.get("/", (req, res) => res.send("API is running ✅"));
 
-  // ✅ Error handler
+  // ✅ Global error handler
   app.use((err, req, res, next) => {
-    if (err && err.message === "Not allowed by CORS") {
+    if (err?.message === "Not allowed by CORS") {
       return res.status(403).json({ message: "CORS blocked: Origin not allowed" });
     }
     console.error("Express Error:", err.stack || err);
@@ -95,7 +102,7 @@ const startServer = async () => {
 // ✅ Start server
 startServer();
 
-// ✅ Crash safety
+// ✅ Crash safety handlers
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err.stack || err);
   process.exit(1);
