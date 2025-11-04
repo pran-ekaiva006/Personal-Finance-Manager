@@ -5,8 +5,7 @@ import PieChart from '../components/PieChart'
 import { useAppContext } from '../contexts/AppProvider'
 
 function Dashboard() {
-  const [statistic, setStatistic] = useState({ categoryBreakdown: [] });
-  const [yearData, setYearData] = useState([]);
+  const { statistic, yearData } = useAppContext();
 
   return (
     <div>
