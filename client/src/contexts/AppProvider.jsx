@@ -72,7 +72,9 @@ function AppProvider({ children }) {
         try {
             const res = await axios.get('/api/auth/me');
             setUser(res.data);
-            navigate('/');
+            if (window.location.pathname === '/login' || window.location.pathname === '/register') {
+                navigate('/');
+            }
         } catch {
             setUser(null);
             navigate('/login');
