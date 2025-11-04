@@ -505,8 +505,8 @@ SOFTWARE.
 **Pran Ekaiva**
 
 - 🐙 GitHub: [@pran-ekaiva006](https://github.com/pran-ekaiva006)
-- 💼 LinkedIn: [Your LinkedIn Profile URL](https://linkedin.com/in/your-profile-url)
-- 📧 Email: your.email@example.com
+- 💼 LinkedIn: [Pran Ekaiva's LinkedIn](https://www.linkedin.com/in/your-linkedin-profile-url/)
+- 📧 Email: pranjalverma975@gmail.com
 
 ---
 
@@ -530,7 +530,7 @@ Special thanks to:
 
 Need help? Here's how to reach out:
 
-- 📧 **Email**: your.email@example.com
+- 📧 **Email**: pranjalverma975@gmail.com
 - 🐛 **Report Issues**: [GitHub Issues](https://github.com/pran-ekaiva006/Personal-Finance-Manager/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/pran-ekaiva006/Personal-Finance-Manager/discussions)
 - 📖 **Documentation**: Check this README for detailed guides
