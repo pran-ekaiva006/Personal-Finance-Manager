@@ -24,10 +24,13 @@ const startServer = async () => {
 
   const app = express();
 
+  // Trust the first proxy, which is important for services like Render
+  app.set('trust proxy', 1);
+
   // ✅ CORS (allow localhost and Render frontend)
   const whitelist = [
     'https://personal-finance-manager1.onrender.com', // Live frontend
-    'http://localhost:5174',
+    'http://localhost:5173', // Corrected port to match client
   ];
 
   const corsOptions = {
@@ -42,9 +45,10 @@ const startServer = async () => {
     credentials: true,
   };
 
-  // Handle preflight requests across all routes
-  app.options('*', cors(corsOptions)); 
-  
+  // ✅ Global OPTIONS preflight handler
+  // This should be the first middleware to ensure all preflight requests are handled.
+  app.options('*', cors(corsOptions));
+
   app.use(cors(corsOptions));
 
   // ✅ Middleware
