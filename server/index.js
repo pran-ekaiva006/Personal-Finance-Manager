@@ -13,6 +13,7 @@ import budgetRoutes from './routes/budgetRoutes.js';
 
 const startServer = async () => {
   await connectDB();
+
   try {
     await sequelize.sync();
     console.log('✅ All models were synchronized successfully.');
@@ -23,60 +24,71 @@ const startServer = async () => {
 
   const app = express();
 
-  // Trust the first proxy, which is important for services like Render
-  app.set('trust proxy', 1);
+  // Required for cookies to work on Render
+  app.set("trust proxy", 1);
 
-  // ✅ CORS (allow localhost and Render frontend)
+  // ✅ Allowed frontend URLs
   const whitelist = [
-    'https://personal-finance-manager1.onrender.com', // Live frontend
-    'http://localhost:5173', // Corrected port to match client
+    "https://personal-finance-manager1.onrender.com",
+    "http://localhost:5173",
   ];
 
   const corsOptions = {
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      if (!origin || whitelist.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        console.error("❌ CORS Blocked Origin:", origin);
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
   };
 
-  // ✅ Global OPTIONS preflight handler
-  // This should be the first middleware to ensure all preflight requests are handled.
-  // app.options('*', cors(corsOptions)); // REMOVE THIS LINE - It is causing the server to crash.
-
+  // ✅ CORS must be BEFORE JSON and routes
   app.use(cors(corsOptions));
+
+  /**
+   * ✅ EXPRESS 5 FIX (NO wildcard allowed)
+   * Handle all OPTIONS requests manually to avoid crashing path-to-regexp.
+   */
+  app.use((req, res, next) => {
+    if (req.method === "OPTIONS") {
+      res.header("Access-Control-Allow-Origin", req.headers.origin);
+      res.header("Access-Control-Allow-Credentials", "true");
+      res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      return res.sendStatus(204);
+    }
+    next();
+  });
 
   // ✅ Middleware
   app.use(express.json());
   app.use(cookieParser());
 
-  // ✅ Request logger
+  // Debug logs
   app.use((req, res, next) => {
-    console.log('[REQ]', req.method, req.originalUrl, 'Origin:', req.headers.origin || '(no origin)');
-    console.log('[COOKIES]', req.cookies);
+    console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
+    console.log("[COOKIES]", req.cookies);
     next();
   });
 
   // ✅ Routes
-  app.use('/api/auth', authRoutes);
-  app.use('/api/transactions', transactionRoutes);
-  app.use('/api/budgets', budgetRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/transactions", transactionRoutes);
+  app.use("/api/budgets", budgetRoutes);
 
   // ✅ Default route
-  app.get('/', (req, res) => res.send('API is running'));
+  app.get("/", (req, res) => res.send("API is running"));
 
   // ✅ Error handling
   app.use((err, req, res, next) => {
-    if (err && err.message === 'Not allowed by CORS') {
-      console.error('CORS Error: Origin not allowed ->', req.headers.origin);
-      return res.status(403).json({ message: 'CORS blocked: This origin is not allowed.' });
+    if (err && err.message === "Not allowed by CORS") {
+      return res.status(403).json({ message: "CORS blocked: Origin not allowed" });
     }
-    console.error('Express error handler:', err && err.stack ? err.stack : err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Express Error:", err.stack || err);
+    res.status(500).json({ message: "Server error" });
   });
 
   const PORT = process.env.PORT || 5001;
@@ -86,12 +98,13 @@ const startServer = async () => {
 // ✅ Start server
 startServer();
 
-// ✅ Process-level crash handlers
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err && err.stack ? err.stack : err);
+// ✅ Process crash safety
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err.stack || err);
   process.exit(1);
 });
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason && reason.stack ? reason.stack : reason);
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason.stack || reason);
   process.exit(1);
 });

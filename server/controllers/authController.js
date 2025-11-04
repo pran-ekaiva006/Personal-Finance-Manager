@@ -8,11 +8,14 @@ const generateToken = (id) => {
 };
 
 const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    // Set domain for production to allow cross-subdomain cookies
+    domain: isProduction ? '.onrender.com' : undefined,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   };
 };
 
@@ -49,9 +52,7 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const options = getCookieOptions();
-    delete options.maxAge; // Not needed for clearing cookie, but doesn't hurt
-    res.clearCookie('token', options);
+    res.clearCookie('token', getCookieOptions());
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server Error' });
