@@ -32,46 +32,44 @@ const startServer = async () => {
     "http://localhost:5173",
   ];
 
-  // ✅ CORS Middleware (Only this — no duplicates)
-  app.use(
-    cors({
-      origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          console.log("❌ CORS BLOCKED:", origin);
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    })
-  );
-
-  // ✅ Fix EXPRESS v5 wildcard issue
-  app.options("*", (req, res) => {
+  // ✅ Handle Preflight OPTIONS requests (Express v5 safe)
+  app.use((req, res, next) => {
     const origin = req.headers.origin;
+
     if (allowedOrigins.includes(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
     }
+
     res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    return res.sendStatus(204);
+
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204); // STOP HERE
+    }
+
+    next();
   });
+
+  // ✅ CORS must be BELOW the preflight middleware
+  app.use(
+    cors({
+      origin: allowedOrigins,
+      credentials: true,
+    })
+  );
 
   app.use(express.json());
   app.use(cookieParser());
 
-  // Debug logs (remove if needed)
+  // Debug logs
   app.use((req, res, next) => {
     console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
     console.log("[COOKIES]", req.cookies);
     next();
   });
 
-  // API Routes
+  // ✅ Routes
   app.use("/api/auth", authRoutes);
   app.use("/api/transactions", transactionRoutes);
   app.use("/api/budgets", budgetRoutes);
