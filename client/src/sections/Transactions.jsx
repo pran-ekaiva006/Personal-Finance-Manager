@@ -82,8 +82,8 @@ function TransactionHistory() {
           {filtered.length === 0 ? (
             <p className="text-center text-gray-500">No transactions found.</p>
           ) : (
-            filtered.map((item, index) => (
-              <TransactionCard item={item} key={index} />
+            filtered.map((item) => (
+              <TransactionCard item={item} key={item.id} />
             ))
           )}
         </div>
