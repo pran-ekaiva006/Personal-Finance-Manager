@@ -93,8 +93,8 @@ function SetBudgets() {
         <h3 className='text-2xl font-semibold'>Monthly Budgets</h3>
 
         <div className='flex flex-col gap-4 mt-6'>
-          {budgets.map((item, index) => (
-            <BudgetCardDisplay key={index} item={item} />
+          {budgets.map((item) => (
+            <BudgetCardDisplay key={item.id} item={item} />
           ))}
         </div>
       </div>
