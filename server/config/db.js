@@ -8,8 +8,7 @@ if (!PG_URI) {
   console.error('❌ PG_URI environment variable is not set. DB connection will be skipped.');
 }
 
-// ✅ Supabase requires SSL but does NOT require custom certificate files.
-//    So we just set "require: true" and "rejectUnauthorized: false"
+// ✅ Enhanced Supabase connection with better error handling
 const sequelize = PG_URI
   ? new Sequelize(PG_URI, {
       dialect: 'postgres',
@@ -20,11 +19,20 @@ const sequelize = PG_URI
           rejectUnauthorized: false,
         },
       },
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 60000, // 60 seconds
+        idle: 10000,    // 10 seconds
+      },
+      retry: {
+        max: 3,
+      },
     })
   : null;
 
-// ✅ Connect DB with retry logic (safe & clean)
-const connectDB = async ({ retries = 5, delayMs = 1000 } = {}) => {
+// ✅ Enhanced connection with better retry logic
+const connectDB = async ({ retries = 10, delayMs = 5000 } = {}) => {
   if (!sequelize) return false;
 
   let attempt = 0;
@@ -36,8 +44,16 @@ const connectDB = async ({ retries = 5, delayMs = 1000 } = {}) => {
     } catch (err) {
       attempt += 1;
       console.error(`⚠️  Unable to connect to PostgreSQL (attempt ${attempt}/${retries}):`, err.message);
-      if (attempt >= retries) return false;
-      await new Promise((res) => setTimeout(res, delayMs));
+      
+      if (err.message.includes('sleep') || err.message.includes('inactive')) {
+        console.log('💤 Database is sleeping. Waiting 10 seconds before retry...');
+        await new Promise((res) => setTimeout(res, 10000));
+      } else if (attempt >= retries) {
+        console.error('❌ Max retries reached. Database connection failed.');
+        return false;
+      } else {
+        await new Promise((res) => setTimeout(res, delayMs));
+      }
     }
   }
   return false;

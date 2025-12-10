@@ -12,14 +12,29 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 import budgetRoutes from "./routes/budgetRoutes.js";
 
 const startServer = async () => {
-  await connectDB();
+  // ✅ Enhanced connection with better error handling
+  const dbConnected = await connectDB({ retries: 10, delayMs: 5000 });
+
+  if (!dbConnected) {
+    console.error("❌ Failed to connect to database after multiple retries.");
+    console.error("🔄 Server will keep trying to reconnect...");
+    
+    // Keep trying to reconnect every 30 seconds
+    setInterval(async () => {
+      console.log("🔄 Attempting to reconnect to database...");
+      const reconnected = await connectDB({ retries: 1, delayMs: 1000 });
+      if (reconnected) {
+        console.log("✅ Database reconnected successfully!");
+      }
+    }, 30000);
+  }
 
   try {
     await sequelize.sync();
     console.log("✅ DB Synced Successfully");
   } catch (err) {
     console.error("❌ Sequelize sync error:", err);
-    process.exit(1);
+    // Don't exit, keep server running
   }
 
   const app = express();
@@ -66,6 +81,16 @@ const startServer = async () => {
   app.use("/api/budgets", budgetRoutes);
 
   app.get("/", (req, res) => res.send("Backend Live ✅"));
+
+  // ✅ Health check endpoint
+  app.get("/health", async (req, res) => {
+    try {
+      await sequelize.authenticate();
+      res.json({ status: "ok", database: "connected" });
+    } catch (err) {
+      res.status(503).json({ status: "error", database: "disconnected", error: err.message });
+    }
+  });
 
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => console.log(`🚀 Backend running on ${PORT}`));
