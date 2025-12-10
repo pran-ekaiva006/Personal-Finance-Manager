@@ -6,35 +6,52 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import connectDB, { sequelize } from "./config/db.js";
+import connectDB, { sequelize, keepAlive } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import budgetRoutes from "./routes/budgetRoutes.js";
 
 const startServer = async () => {
-  // ✅ Enhanced connection with better error handling
-  const dbConnected = await connectDB({ retries: 10, delayMs: 5000 });
+  // ✅ Enhanced connection with longer timeout for sleeping database
+  const dbConnected = await connectDB({ retries: 15, initialDelayMs: 2000 });
 
   if (!dbConnected) {
     console.error("❌ Failed to connect to database after multiple retries.");
-    console.error("🔄 Server will keep trying to reconnect...");
+    console.error("🔄 Server will start but database operations will fail until connection is restored.");
     
-    // Keep trying to reconnect every 30 seconds
-    setInterval(async () => {
-      console.log("🔄 Attempting to reconnect to database...");
-      const reconnected = await connectDB({ retries: 1, delayMs: 1000 });
+    // ✅ Keep trying to reconnect in background
+    const reconnectInterval = setInterval(async () => {
+      console.log("🔄 Background: Attempting to reconnect to database...");
+      const reconnected = await connectDB({ retries: 2, initialDelayMs: 1000 });
       if (reconnected) {
         console.log("✅ Database reconnected successfully!");
+        clearInterval(reconnectInterval);
+        
+        // ✅ Start keepalive pings
+        keepAlive();
+        
+        // ✅ Sync models after reconnection
+        try {
+          await sequelize.sync();
+          console.log("✅ DB Synced Successfully after reconnection");
+        } catch (err) {
+          console.error("❌ Sequelize sync error after reconnection:", err);
+        }
       }
-    }, 30000);
+    }, 30000); // Try every 30 seconds
+  } else {
+    // ✅ Database connected on first try - start keepalive
+    keepAlive();
   }
 
-  try {
-    await sequelize.sync();
-    console.log("✅ DB Synced Successfully");
-  } catch (err) {
-    console.error("❌ Sequelize sync error:", err);
-    // Don't exit, keep server running
+  // ✅ Sync models (only if connected)
+  if (dbConnected) {
+    try {
+      await sequelize.sync();
+      console.log("✅ DB Synced Successfully");
+    } catch (err) {
+      console.error("❌ Sequelize sync error:", err);
+    }
   }
 
   const app = express();
@@ -45,9 +62,10 @@ const startServer = async () => {
   const allowedOrigins = [
     "https://personal-finance-manager1.onrender.com",
     "http://localhost:5173",
+    "http://localhost:5174", // Added for Vite
   ];
 
-  // ✅ Single CORS + Preflight middleware (no conflicting cors())
+  // ✅ CORS + Preflight middleware
   app.use((req, res, next) => {
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
@@ -59,7 +77,7 @@ const startServer = async () => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
     if (req.method === "OPTIONS") {
-      return res.sendStatus(204); // ✅ Fix CORS preflight
+      return res.sendStatus(204);
     }
 
     next();
@@ -68,12 +86,13 @@ const startServer = async () => {
   app.use(express.json());
   app.use(cookieParser());
 
-  // Debug
-  app.use((req, res, next) => {
-    console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
-    console.log("[COOKIES]", req.cookies);
-    next();
-  });
+  // Debug (disable in production)
+  if (process.env.NODE_ENV !== "production") {
+    app.use((req, res, next) => {
+      console.log("[REQ]", req.method, req.originalUrl, "Origin:", req.headers.origin);
+      next();
+    });
+  }
 
   // ✅ API Routes
   app.use("/api/auth", authRoutes);
@@ -82,13 +101,22 @@ const startServer = async () => {
 
   app.get("/", (req, res) => res.send("Backend Live ✅"));
 
-  // ✅ Health check endpoint
+  // ✅ Health check endpoint with database status
   app.get("/health", async (req, res) => {
     try {
       await sequelize.authenticate();
-      res.json({ status: "ok", database: "connected" });
+      res.json({ 
+        status: "ok", 
+        database: "connected",
+        timestamp: new Date().toISOString()
+      });
     } catch (err) {
-      res.status(503).json({ status: "error", database: "disconnected", error: err.message });
+      res.status(503).json({ 
+        status: "error", 
+        database: "disconnected", 
+        error: err.message,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
