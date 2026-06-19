@@ -9,6 +9,10 @@ function Budgets() {
 
   return (
     <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Budgets</h1>
+        <p className="text-sm text-gray-500 mt-1">Track spending against your limits</p>
+      </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         <MoneyCard title={"Total Budget"} amount={budgetUsage.total.totalBudget} icon={"$"} style={"text-green-600"} />
         <MoneyCard title={"Total Spent"} amount={budgetUsage.total.totalSpent} icon={"-"} style={"text-red-600"} textColor="text-red-600" />

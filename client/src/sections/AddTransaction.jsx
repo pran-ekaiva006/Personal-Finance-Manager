@@ -69,6 +69,10 @@ function AddTransaction() {
 
   return (
     <div className="w-full">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Add Transaction</h1>
+        <p className="text-sm text-gray-500 mt-1">Record income or an expense</p>
+      </div>
       {/* Card container */}
       <div className="rounded-xl bg-white py-6 px-6 border border-gray-200">
         <h1 className="text-xl font-semibold mb-6">

@@ -33,6 +33,10 @@ function SetBudgets() {
 
   return (
     <div className='w-full'>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Set Budgets</h1>
+        <p className="text-sm text-gray-500 mt-1">Create and edit monthly limits</p>
+      </div>
       <div className='rounded-xl bg-white py-6 px-6 border border-gray-200'>
         <h1 className='text-xl font-semibold mb-6'>
           <span className='text-blue-500'>+</span> Set Monthly Budget

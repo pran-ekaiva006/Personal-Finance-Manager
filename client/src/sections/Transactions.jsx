@@ -37,6 +37,10 @@ function TransactionHistory() {
 
   return (
     <div className="w-full">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
+        <p className="text-sm text-gray-500 mt-1">Search and review your full history</p>
+      </div>
 
       <div className="rounded-xl bg-white p-6 border border-gray-200 mb-10">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">

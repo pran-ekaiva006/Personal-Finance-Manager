@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Menu, X, Home, History, BadgeDollarSign, Goal, UserCircle, SlidersVertical
+  Menu, X, Home, History, BadgeDollarSign, Goal, UserCircle, SlidersVertical, Search
 } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAppContext } from "../contexts/AppProvider";
@@ -12,6 +12,7 @@ export default function UserLayout() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const sidebarRef = useRef(null);
   const toggleRef = useRef(null);
@@ -28,9 +29,9 @@ export default function UserLayout() {
   const menuItems = [
     { name: "Dashboard", icon: <Home size={20} />, href: "/" },
     { name: "Add Transactions", icon: <BadgeDollarSign size={20} />, href: "/add-transactions" },
-    { name: "Budgets", icon: <Goal size={20} />, href: "/budgets" },
-    { name: "Set Budgets", icon: <SlidersVertical size={20} />, href: "/set-budgets" },
     { name: "Transactions", icon: <History size={20} />, href: "/transactions" },
+    { name: "Set Budgets", icon: <SlidersVertical size={20} />, href: "/set-budgets" },
+    { name: "Budgets", icon: <Goal size={20} />, href: "/budgets" },
   ];
 
   useEffect(() => {
@@ -108,8 +109,9 @@ export default function UserLayout() {
           </button>
 
           <div className="flex items-center justify-between md:w-full gap-4">
-            {/* Search */}
+            {/* Desktop Search */}
             <div className="hidden md:flex items-center border pl-3 gap-2 bg-white border-gray-300 h-[46px] rounded-md w-full max-w-md">
+              <Search size={16} className="text-gray-400" />
               <input
                 type="text"
                 placeholder="Search transactions..."
@@ -120,6 +122,15 @@ export default function UserLayout() {
                 }}
               />
             </div>
+
+            {/* Mobile Search Icon */}
+            <button
+              className="md:hidden p-2 rounded-lg border border-gray-300 text-gray-600"
+              onClick={() => setMobileSearchOpen((prev) => !prev)}
+              aria-label="Toggle search"
+            >
+              <Search size={20} />
+            </button>
 
             {/* User Dropdown */}
             <div className="relative" ref={userDropdownRef}>
@@ -141,6 +152,32 @@ export default function UserLayout() {
             </div>
           </div>
         </header>
+
+        {/* Mobile Search Overlay */}
+        {mobileSearchOpen && (
+          <div className="md:hidden px-4 py-3 bg-white border-b border-gray-200">
+            <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 h-[42px]">
+              <Search size={16} className="text-gray-400 shrink-0" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search transactions..."
+                className="w-full text-sm text-gray-600 outline-none"
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  navigate("/transactions");
+                }}
+              />
+              <button
+                onClick={() => setMobileSearchOpen(false)}
+                className="text-gray-400"
+                aria-label="Close search"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Scrollable Page Content */}
         <main className="p-6 bg-gray-50 flex-1 overflow-y-auto">

@@ -9,6 +9,10 @@ function Dashboard() {
 
   return (
     <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-1">Your financial overview at a glance</p>
+      </div>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
         <div className='grid xl:grid-cols-2 grid-cols-1 gap-4'>
           <MoneyCard title={"Total Balance"} amount={statistic.balance}
