@@ -14,9 +14,9 @@ function BudgetCardDisplay({ item }) {
     const progress = budgetAmount > 0 ? (spentAmount / budgetAmount) * 100 : 0;
 
     const getProgressBarColor = (percentage) => {
-        if (percentage < 50) return 'bg-green-500';
-        if (percentage < 75) return 'bg-yellow-500';
-        return 'bg-red-500';
+        if (percentage < 50) return 'bg-signal';
+        if (percentage < 75) return 'bg-warning';
+        return 'bg-clay';
     };
 
     const handleSave = async () => {
@@ -46,42 +46,42 @@ function BudgetCardDisplay({ item }) {
     }
 
     return (
-        <div className='bg-gray-50 flex flex-col px-5 py-4 rounded-xl'>
+        <div className='bg-gray-50 dark:bg-slate-900/60 border border-transparent dark:border-slate-800/80 flex flex-col px-5 py-4 rounded-xl'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center w-full'>
                 <div>
-                    <p className='font-semibold text-xl'>{item.category}</p>
-                    <p className='text-sm text-black/70'>Monthly Budget</p>
+                    <p className='font-semibold text-xl text-gray-900 dark:text-white'>{item.category}</p>
+                    <p className='text-sm text-gray-500 dark:text-gray-400'>Monthly Budget</p>
                 </div>
-
+ 
                 <div className='flex items-center justify-between gap-4 mt-3 md:mt-0'>
                     {isEditing ? (
                         <input
                             type='number'
                             value={editedAmount}
                             onChange={(e) => setEditedAmount(e.target.value)}
-                            className='border border-gray-300 rounded-md px-2 py-1 w-28'
+                            className='border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-md px-2 py-1 w-28'
                         />
                     ) : (
-                        <span className='text-lg font-bold'>Rs {item.amount.toFixed(2)}</span>
+                        <span className='text-lg font-bold text-gray-900 dark:text-white'>Rs {item.amount.toFixed(2)}</span>
                     )}
                     <div className='flex gap-2'>
                         {isEditing ? (
                             <button
-                                className='hover:bg-green-50 text-green-600 p-1 rounded-md border border-gray-200 hover:border-green-400'
+                                className='hover:bg-green-50 dark:hover:bg-green-950/20 text-signal p-1 rounded-md border border-gray-200 dark:border-slate-800 hover:border-green-400'
                                 onClick={handleSave}
                             >
                                 <Save size={20} />
                             </button>
                         ) : (
                             <button
-                                className='hover:bg-blue-50 text-blue-500 p-1 rounded-md border border-gray-200 hover:border-blue-300'
+                                className='hover:bg-blue-50 dark:hover:bg-blue-950/20 text-blue-500 p-1 rounded-md border border-gray-200 dark:border-slate-800 hover:border-blue-300'
                                 onClick={() => setIsEditing(true)}
                             >
                                 <SquarePen size={20} />
                             </button>
                         )}
                         <button
-                            className='hover:bg-red-50 text-red-500 p-1 rounded-md border border-gray-200 hover:border-red-300'
+                            className='hover:bg-red-50 dark:hover:bg-red-950/20 text-clay p-1 rounded-md border border-gray-200 dark:border-slate-800 hover:border-red-300'
                             onClick={handleDelete}
                         >
                             <X size={20} />
@@ -91,10 +91,10 @@ function BudgetCardDisplay({ item }) {
             </div>
             <div className='mt-4'>
                 <div className='flex justify-between items-center mb-1'>
-                    <span className='text-sm text-gray-600'>Spent: Rs {spentAmount.toFixed(2)}</span>
-                    <span className='text-sm text-gray-600'>Remaining: Rs {(budgetAmount - spentAmount).toFixed(2)}</span>
+                    <span className='text-sm text-gray-600 dark:text-gray-400'>Spent: Rs {spentAmount.toFixed(2)}</span>
+                    <span className='text-sm text-gray-600 dark:text-gray-400'>Remaining: Rs {(budgetAmount - spentAmount).toFixed(2)}</span>
                 </div>
-                <div className='w-full bg-gray-200 rounded-full h-2.5'>
+                <div className='w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2.5'>
                     <div
                         className={`${getProgressBarColor(progress)} h-2.5 rounded-full`}
                         style={{ width: `${Math.min(progress, 100)}%` }}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Menu, X, Home, History, BadgeDollarSign, Goal, UserCircle, SlidersVertical, Search
+  Menu, X, Home, History, BadgeDollarSign, Goal, UserCircle, SlidersVertical, Search, Sun, Moon
 } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAppContext } from "../contexts/AppProvider";
@@ -13,6 +13,21 @@ export default function UserLayout() {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (darkMode) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
   const sidebarRef = useRef(null);
   const toggleRef = useRef(null);
@@ -59,20 +74,20 @@ export default function UserLayout() {
       {/* Sidebar */}
       <aside
         ref={sidebarRef}
-        className={`fixed md:static z-40 top-0 left-0 h-full w-64 bg-white border-r border-gray-300 
+        className={`fixed md:static z-40 top-0 left-0 h-full w-64 bg-white dark:bg-slate-950 border-r border-gray-300 dark:border-slate-900 
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         <div className="flex items-center justify-between px-5 py-8">
           <span
             onClick={() => navigate("/dashboard")}
-            className="text-xl text-green-600 font-bold flex items-center gap-2 cursor-pointer"
+            className="text-xl text-signal font-bold flex items-center gap-2 cursor-pointer"
           >
             <img src="./logo.png" alt="" className="size-8" /> CashFlowX
           </span>
           <button
             ref={toggleRef}
-            className="md:hidden"
+            className="md:hidden text-gray-700 dark:text-gray-300"
             onClick={() => setIsOpen(false)}
           >
             <X size={24} />
@@ -84,10 +99,10 @@ export default function UserLayout() {
             <Link
               key={href}
               to={href}
-              className={`flex items-center gap-3 py-3 px-2.5 font-semibold rounded-lg border
+              className={`flex items-center gap-3 py-3 px-2.5 font-semibold rounded-lg border transition-all
               ${location.pathname === href
-                  ? "bg-blue-50 text-blue-700 border-blue-200"
-                  : "border-transparent text-gray-700 hover:bg-gray-100"
+                  ? "bg-signal/10 dark:bg-signal/20 text-signal border-signal/20 dark:border-signal/30"
+                  : "border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900"
                 }`}
             >
               {icon} <span>{name}</span>
@@ -99,10 +114,10 @@ export default function UserLayout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-30 bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-900 px-4 py-4 flex items-center justify-between gap-4">
           <button
             ref={toggleRef}
-            className="md:hidden text-gray-800"
+            className="md:hidden text-gray-800 dark:text-gray-250"
             onClick={() => setIsOpen(true)}
           >
             <Menu size={24} />
@@ -110,12 +125,12 @@ export default function UserLayout() {
 
           <div className="flex items-center justify-between md:w-full gap-4">
             {/* Desktop Search */}
-            <div className="hidden md:flex items-center border pl-3 gap-2 bg-white border-gray-300 h-[46px] rounded-md w-full max-w-md">
+            <div className="hidden md:flex items-center border pl-3 gap-2 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-800 h-[46px] rounded-md w-full max-w-md">
               <Search size={16} className="text-gray-400" />
               <input
                 type="text"
                 placeholder="Search transactions..."
-                className="w-full h-full text-sm text-gray-600 outline-none"
+                className="w-full h-full text-sm text-gray-600 dark:text-gray-200 bg-transparent outline-none"
                 onChange={(e) => {
                   setSearch(e.target.value);
                   navigate("/transactions");
@@ -123,46 +138,58 @@ export default function UserLayout() {
               />
             </div>
 
-            {/* Mobile Search Icon */}
-            <button
-              className="md:hidden p-2 rounded-lg border border-gray-300 text-gray-600"
-              onClick={() => setMobileSearchOpen((prev) => !prev)}
-              aria-label="Toggle search"
-            >
-              <Search size={20} />
-            </button>
-
-            {/* User Dropdown */}
-            <div className="relative" ref={userDropdownRef}>
-              <button onClick={() => setShowUserDropdown(prev => !prev)} className="cursor-pointer">
-                <UserCircle size={30} className="text-gray-700" />
+            {/* Actions group */}
+            <div className="flex items-center gap-3">
+              {/* Mobile Search Icon */}
+              <button
+                className="md:hidden p-2 rounded-lg border border-gray-300 dark:border-slate-800 text-gray-600 dark:text-gray-300 cursor-pointer"
+                onClick={() => setMobileSearchOpen((prev) => !prev)}
+                aria-label="Toggle search"
+              >
+                <Search size={20} />
               </button>
 
-              {showUserDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg border border-gray-200 p-4 z-50">
-                  <p className="text-sm font-semibold text-gray-800 mb-2">{user.email}</p>
-                  <button
-                    className="text-red-500 cursor-pointer bg-red-50 border w-full px-3 py-2 rounded border-red-500 text-sm font-medium"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={() => setDarkMode(prev => !prev)}
+                className="p-2 rounded-lg border border-gray-300 dark:border-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-900 transition-colors cursor-pointer"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
+              {/* User Dropdown */}
+              <div className="relative" ref={userDropdownRef}>
+                <button onClick={() => setShowUserDropdown(prev => !prev)} className="cursor-pointer flex items-center">
+                  <UserCircle size={30} className="text-gray-700 dark:text-gray-300" />
+                </button>
+
+                {showUserDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 p-4 z-50 shadow-lg">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2 truncate">{user.email}</p>
+                    <button
+                      className="text-clay cursor-pointer bg-red-50/50 dark:bg-red-950/20 border w-full px-3 py-2 rounded border-clay/30 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
         {/* Mobile Search Overlay */}
         {mobileSearchOpen && (
-          <div className="md:hidden px-4 py-3 bg-white border-b border-gray-200">
-            <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 h-[42px]">
+          <div className="md:hidden px-4 py-3 bg-white dark:bg-slate-950 border-b border-gray-200 dark:border-slate-900">
+            <div className="flex items-center gap-2 border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-md px-3 h-[42px]">
               <Search size={16} className="text-gray-400 shrink-0" />
               <input
                 type="text"
                 autoFocus
                 placeholder="Search transactions..."
-                className="w-full text-sm text-gray-600 outline-none"
+                className="w-full text-sm text-gray-600 dark:text-gray-200 bg-transparent outline-none"
                 onChange={(e) => {
                   setSearch(e.target.value);
                   navigate("/transactions");
@@ -180,7 +207,7 @@ export default function UserLayout() {
         )}
 
         {/* Scrollable Page Content */}
-        <main className="p-6 bg-gray-50 flex-1 overflow-y-auto">
+        <main className="p-6 bg-gray-50 dark:bg-slate-950/40 text-gray-900 dark:text-gray-100 flex-1 overflow-y-auto">
           {loading ? <SkeletonLoader /> : <Outlet />}
         </main>
       </div>
