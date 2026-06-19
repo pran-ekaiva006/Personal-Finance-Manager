@@ -35,8 +35,8 @@ export default function UserLayout() {
 
   const handleLogout = async () => {
     try {
-      const res = await logout();
-    } catch (error) {
+      await logout();
+    } catch {
       return null;
     }
   }

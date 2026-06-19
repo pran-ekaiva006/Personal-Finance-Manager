@@ -26,7 +26,7 @@ function LandingPage() {
         password: 'demoPassword123',
       });
       toast.success('Welcome to the Demo Account!', { id: toastId });
-    } catch (error) {
+    } catch {
       toast.error('Failed to log in to demo account. Please try again.', { id: toastId });
     } finally {
       setDemoLoading(false);

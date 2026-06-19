@@ -4,7 +4,7 @@
   "main": "start.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "start": "node start.js",
     "dev": "nodemon start.js",
     "db:test": "node -e \"import('pg').then(({Client})=>{const c=new Client({connectionString:process.env.PG_URI}); c.connect().then(()=>{console.log('connected'); c.end()}).catch(e=>{console.error(e.stack); process.exit(1)})}).catch(e=>{console.error(e && e.stack || e); process.exit(1)})\"",
@@ -29,5 +29,9 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.9"
   }
 }

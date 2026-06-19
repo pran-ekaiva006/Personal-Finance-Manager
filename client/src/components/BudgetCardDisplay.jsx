@@ -30,7 +30,7 @@ function BudgetCardDisplay({ item }) {
             );
             await getBudgetUsage();
             setIsEditing(false);
-        } catch (error) {
+        } catch {
             return null;
         }
     }
@@ -40,7 +40,7 @@ function BudgetCardDisplay({ item }) {
             await deleteBudget(item.id);
             await getBudgets();
             await getBudgetUsage();
-        } catch (error) {
+        } catch {
             return null
         }
     }

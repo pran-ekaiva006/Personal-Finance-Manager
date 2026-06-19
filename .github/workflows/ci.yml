@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Client Dependencies
+        run: npm install
+        working-directory: ./client
+
+      - name: Lint Client
+        run: npm run lint
+        working-directory: ./client
+
+      - name: Build Client
+        run: npm run build
+        working-directory: ./client
+
+      - name: Install Server Dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Run Server Tests
+        run: npm test
+        working-directory: ./server

@@ -58,6 +58,46 @@ export const deleteBudget = async (req, res) => {
 
 
 
+export const calculateBudgetUsage = (budgets, expenses) => {
+  const expenseMap = {};
+  expenses.forEach((e) => {
+    // support both DB query object format { category, totalSpent } and custom mock format { category, spent }
+    const spentVal = e.totalSpent !== undefined ? e.totalSpent : e.spent;
+    expenseMap[e.category] = parseFloat(spentVal || 0);
+  });
+
+  // Per-category report
+  const report = budgets.map(budget => {
+    const spent = expenseMap[budget.category] || 0;
+    const remaining = budget.amount - spent;
+    const percentLeft = budget.amount === 0 ? 0 : parseFloat(((remaining / budget.amount) * 100).toFixed(2));
+
+    return {
+      category: budget.category,
+      allocated: budget.amount,
+      spent,
+      remaining,
+      percentLeft
+    };
+  });
+
+  // Global totals
+  const totalBudget = budgets.reduce((acc, b) => acc + b.amount, 0);
+  const totalSpent = report.reduce((acc, b) => acc + b.spent, 0);
+  const remaining = totalBudget - totalSpent;
+  const percentUsed = totalBudget === 0 ? 0 : parseFloat(((totalSpent / totalBudget) * 100).toFixed(2));
+
+  return {
+    report,
+    total: {
+      totalBudget,
+      totalSpent,
+      remaining,
+      percentUsed
+    }
+  };
+};
+
 export const getBudgetUsageThisMonth = async (req, res) => {
   try {
     const now = new Date();
@@ -84,42 +124,12 @@ export const getBudgetUsageThisMonth = async (req, res) => {
       raw: true,
     });
 
-    const expenseMap = {};
-    expenses.forEach((e) => {
-      expenseMap[e.category] = parseFloat(e.totalSpent);
-    });
-
-    // Per-category report
-    const report = budgets.map(budget => {
-      const spent = expenseMap[budget.category] || 0;
-      const remaining = budget.amount - spent;
-      const percentLeft = budget.amount === 0 ? 0 : parseFloat(((remaining / budget.amount) * 100).toFixed(2));
-
-      return {
-        category: budget.category,
-        allocated: budget.amount,
-        spent,
-        remaining,
-        percentLeft
-      };
-    });
-
-    // Global totals
-    const totalBudget = budgets.reduce((acc, b) => acc + b.amount, 0);
-    const totalSpent = report.reduce((acc, b) => acc + b.spent, 0);
-    const remaining = totalBudget - totalSpent;
-    const percentUsed = totalBudget === 0 ? 0 : parseFloat(((totalSpent / totalBudget) * 100).toFixed(2));
+    const result = calculateBudgetUsage(budgets, expenses);
 
     res.json({
       month: month + 1,
       year,
-      report,
-      total: {
-        totalBudget,
-        totalSpent,
-        remaining,
-        percentUsed
-      }
+      ...result
     });
 
   } catch (err) {

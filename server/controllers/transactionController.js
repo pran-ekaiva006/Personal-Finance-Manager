@@ -23,6 +23,32 @@ export const getTransactions = async (req, res) => {
 
 
 
+export const calculateMonthlySummary = (transactions) => {
+  let income = 0;
+  let expense = 0;
+  const categorySummary = {};
+
+  for (const t of transactions) {
+    const amount = parseFloat(t.amount || 0);
+    if (t.type === 'Income') {
+      income += amount;
+    } else if (t.type === 'Expense') {
+      expense += amount;
+      categorySummary[t.category] = (categorySummary[t.category] || 0) + amount;
+    }
+  }
+
+  const balance = income - expense;
+  const savingRate = income > 0 ? ((balance / income) * 100).toFixed(2) : '0.00';
+
+  const categoryBreakdown = Object.entries(categorySummary).map(([category, amount]) => ({
+    name: category,
+    value: expense > 0 ? ((amount / expense) * 100) : 0.0
+  }));
+
+  return { income, expense, balance, savingRate, categoryBreakdown };
+};
+
 export const getMonthlySummary = async (req, res) => {
   try {
     const { year, month } = req.params;
@@ -36,28 +62,8 @@ export const getMonthlySummary = async (req, res) => {
       }
     });
 
-    let income = 0;
-    let expense = 0;
-    const categorySummary = {};
-
-    for (const t of transactions) {
-      if (t.type === 'Income') {
-        income += t.amount;
-      } else if (t.type === 'Expense') {
-        expense += t.amount;
-        categorySummary[t.category] = (categorySummary[t.category] || 0) + t.amount;
-      }
-    }
-
-    const balance = income - expense;
-    const savingRate = income > 0 ? ((balance / income) * 100).toFixed(2) : '0.00';
-
-    const categoryBreakdown = Object.entries(categorySummary).map(([category, amount]) => ({
-      name: category,
-      value: expense > 0 ? ((amount / expense) * 100) : 0.0
-    }));
-
-    res.json({ income, expense, balance, savingRate, categoryBreakdown });
+    const summary = calculateMonthlySummary(transactions);
+    res.json(summary);
   } catch (error) {
     console.error('Monthly summary error:', error);
     res.status(500).json({ message: 'Server error' });
