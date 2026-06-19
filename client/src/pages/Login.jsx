@@ -109,6 +109,18 @@ function Login() {
             />
           </div>
 
+          {/* Forgot password link (login only) */}
+          {state === "login" && (
+            <div className="text-right mb-4">
+              <span
+                className="text-sm text-blue-600 cursor-pointer hover:underline"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Forgot password?
+              </span>
+            </div>
+          )}
+
           {/* Submit button */}
           <button
             type="submit"

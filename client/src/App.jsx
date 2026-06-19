@@ -1,6 +1,8 @@
 import React from 'react'
 import UserLayout from './pages/UserLayout'
 import Login from './pages/Login'
+import NotFound from './pages/NotFound'
+import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './sections/Dashboard'
 import AddTransaction from './sections/AddTransaction'
 import Transactions from './sections/Transactions'
@@ -14,8 +16,9 @@ function App() {
   return (
     <>
       <Routes>
-        {/** Login route (public) */}
+        {/** Public routes */}
         <Route path='login' element={<Login />} />
+        <Route path='forgot-password' element={<ForgotPassword />} />
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
@@ -27,6 +30,9 @@ function App() {
             <Route path='/transactions' element={<Transactions />} />
           </Route>
         </Route>
+
+        {/* Catch-all 404 */}
+        <Route path='*' element={<NotFound />} />
       </Routes>
       {/** Toast notifications */}
       <Toaster />

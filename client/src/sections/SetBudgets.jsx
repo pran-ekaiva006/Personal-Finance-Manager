@@ -37,6 +37,21 @@ function SetBudgets() {
         <h1 className="text-2xl font-bold text-gray-900">Set Budgets</h1>
         <p className="text-sm text-gray-500 mt-1">Create and edit monthly limits</p>
       </div>
+
+      {budgets.length === 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <div className="flex gap-4 items-start">
+            <div className="text-3xl">🎯</div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">You haven't set any budgets yet</h2>
+              <p className="text-sm text-gray-500">
+                Use the form below to create monthly spending limits for each category. Once set, you can track your spending against them on the Budgets page.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className='rounded-xl bg-white py-6 px-6 border border-gray-200'>
         <h1 className='text-xl font-semibold mb-6'>
           <span className='text-blue-500'>+</span> Set Monthly Budget
@@ -93,15 +108,17 @@ function SetBudgets() {
         </div>
       </div>
 
-      <div className='rounded-xl bg-white py-6 px-6 border border-gray-200 mt-12'>
-        <h3 className='text-2xl font-semibold'>Monthly Budgets</h3>
+      {budgets.length > 0 && (
+        <div className='rounded-xl bg-white py-6 px-6 border border-gray-200 mt-12'>
+          <h3 className='text-2xl font-semibold'>Monthly Budgets</h3>
 
-        <div className='flex flex-col gap-4 mt-6'>
-          {budgets.map((item) => (
-            <BudgetCardDisplay key={item.id} item={item} />
-          ))}
+          <div className='flex flex-col gap-4 mt-6'>
+            {budgets.map((item) => (
+              <BudgetCardDisplay key={item.id} item={item} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
