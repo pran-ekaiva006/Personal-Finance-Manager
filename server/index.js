@@ -4,6 +4,7 @@ console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Loaded" : "Missing");
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 
 import connectDB, { sequelize, keepAlive } from "./config/db.js";
@@ -65,23 +66,16 @@ const startServer = async () => {
     "http://localhost:5174", // Added for Vite
   ];
 
-  // ✅ CORS + Preflight middleware
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-      res.header("Access-Control-Allow-Origin", origin);
-    }
+  // ✅ Security headers
+  app.use(helmet());
 
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(204);
-    }
-
-    next();
-  });
+  // ✅ CORS middleware
+  app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }));
 
   app.use(express.json());
   app.use(cookieParser());
