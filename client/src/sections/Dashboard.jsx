@@ -1,20 +1,62 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import MoneyCard from '../components/MoneyCard'
 import SimpleLineChart from '../components/SimpleLineChart'
 import PieChart from '../components/PieChart'
 import { useAppContext } from '../contexts/AppProvider'
 
 function Dashboard() {
-  const { statistic, yearData, navigate } = useAppContext();
+  const { statistic, yearData, navigate, fetchMonthlySummary } = useAppContext();
+
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    fetchMonthlySummary({ year: selectedYear, month: selectedMonth });
+  }, [selectedMonth, selectedYear, fetchMonthlySummary]);
 
   const isEmpty = statistic.income === 0 && statistic.expense === 0;
-  const currentMonthName = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+  const displayMonthName = new Date(selectedYear, selectedMonth - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your financial overview at a glance</p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your financial overview at a glance</p>
+        </div>
+
+        {/* Date Selector */}
+        <div className="flex gap-2 shrink-0">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="px-3 py-2 border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-signal cursor-pointer"
+          >
+            {Array.from({ length: 12 }, (_, i) => {
+              const date = new Date(0, i);
+              return (
+                <option key={i + 1} value={i + 1}>
+                  {date.toLocaleString('default', { month: 'long' })}
+                </option>
+              );
+            })}
+          </select>
+
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-3 py-2 border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-signal cursor-pointer"
+          >
+            {Array.from({ length: 5 }, (_, i) => {
+              const y = new Date().getFullYear() - 2 + i;
+              return (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              );
+            })}
+          </select>
+        </div>
       </div>
 
       {isEmpty ? (
@@ -48,7 +90,7 @@ function Dashboard() {
               </div>
               <div className="text-left sm:text-right">
                 <span className="text-xs md:text-sm font-bold tracking-widest text-muted uppercase [font-variant:all-small-caps]">
-                  {currentMonthName}
+                  {displayMonthName}
                 </span>
               </div>
             </div>

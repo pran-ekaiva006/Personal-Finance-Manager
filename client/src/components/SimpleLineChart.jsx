@@ -24,8 +24,8 @@ function IncomeExpenseChart({data}) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line strokeWidth={3} type="monotone" dataKey="income" stroke="#4CAF50" activeDot={{ r: 8 }} />
-              <Line strokeWidth={3} type="monotone" dataKey="expense" stroke="#F44336" />
+              <Line strokeWidth={3} type="monotone" dataKey="income" stroke="#1F7A4D" activeDot={{ r: 8 }} />
+              <Line strokeWidth={3} type="monotone" dataKey="expense" stroke="#C4622D" />
             </LineChart>
           </ResponsiveContainer>
         )

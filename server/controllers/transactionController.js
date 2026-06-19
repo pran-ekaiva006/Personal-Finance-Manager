@@ -71,26 +71,41 @@ export const getMonthlySummary = async (req, res) => {
 export const getMonthlyIncomeExpenseSummary = async (req, res) => {
   try {
     const userId = req.user.id;
+    const yearsBack = parseInt(req.query.yearsBack || 1);
+    const monthsToRoll = 12 * yearsBack;
+
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); // 0-based index
 
-    // Fetch all transactions for the year
+    // Start of rolling period: (monthsToRoll - 1) months ago, day 1
+    const startOfPeriod = new Date(currentYear, currentMonth - (monthsToRoll - 1), 1, 0, 0, 0, 0);
+    // End of rolling period: end of current month
+    const endOfPeriod = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999);
+
+    // Fetch all transactions in the rolling range
     const transactions = await Transaction.findAll({
       where: {
         UserId: userId,
         date: {
-          [Op.gte]: new Date(currentYear, 0, 1),
-          [Op.lte]: new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999),
+          [Op.gte]: startOfPeriod,
+          [Op.lte]: endOfPeriod,
         }
       }
     });
 
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const monthlyData = [];
-    for (let i = 0; i <= currentMonth; i++) {
+
+    // Pre-populate the rolling month objects in chronological order
+    for (let i = monthsToRoll - 1; i >= 0; i--) {
+      const d = new Date(currentYear, currentMonth - i, 1);
+      const mIdx = d.getMonth();
+      const y = d.getFullYear();
       monthlyData.push({
-        month: monthLabels[i],
+        month: `${monthLabels[mIdx]} '${y.toString().slice(-2)}`,
+        monthIndex: mIdx,
+        year: y,
         income: 0,
         expense: 0
       });
@@ -98,15 +113,27 @@ export const getMonthlyIncomeExpenseSummary = async (req, res) => {
 
     transactions.forEach(entry => {
       const dateObj = new Date(entry.date);
-      const index = dateObj.getMonth();
-      if (entry.type === 'Income') {
-        monthlyData[index].income += entry.amount;
-      } else if (entry.type === 'Expense') {
-        monthlyData[index].expense += entry.amount;
+      const m = dateObj.getMonth();
+      const y = dateObj.getFullYear();
+      
+      const target = monthlyData.find(d => d.monthIndex === m && d.year === y);
+      if (target) {
+        if (entry.type === 'Income') {
+          target.income += entry.amount;
+        } else if (entry.type === 'Expense') {
+          target.expense += entry.amount;
+        }
       }
     });
 
-    res.status(200).json(monthlyData);
+    // Remove temporary index properties before sending
+    const cleanedData = monthlyData.map(({ month, income, expense }) => ({
+      month,
+      income,
+      expense
+    }));
+
+    res.status(200).json(cleanedData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

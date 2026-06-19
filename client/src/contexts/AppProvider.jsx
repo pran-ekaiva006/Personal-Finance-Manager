@@ -124,11 +124,11 @@ function AppProvider({ children }) {
     }
   };
 
-  const fetchMonthlySummary = async () => {
+  const fetchMonthlySummary = async (dateParams) => {
     try {
       const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth() + 1;
+      const year = dateParams?.year || now.getFullYear();
+      const month = dateParams?.month || (now.getMonth() + 1);
       const { data } = await axios.get(`transactions/summary/${year}/${month}`);
       setStatistic(data);
     } catch {
@@ -229,6 +229,7 @@ function AppProvider({ children }) {
         addTransaction,
         getTransactions,
         deleteTransaction,
+        fetchMonthlySummary,
         addBudget,
         budgets,
         expenseCategory,
