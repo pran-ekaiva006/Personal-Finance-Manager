@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "cashflowx-server",
   "version": "1.0.0",
   "main": "start.js",
   "type": "module",

@@ -1,8 +1,8 @@
-# 💰 Personal-Finance-Manager
+# 💰 CashFlowX
 
 ![README](/client/public/logo.png)
 
-<h1 align="center">Personal Finance Manager</h1>
+<h1 align="center">CashFlowX</h1>
 
 <p align="center">
   <a href="https://github.com/pran-ekaiva006/Personal-Finance-Manager">
@@ -43,7 +43,7 @@
 
 ### **About The Project**
 
-**Personal Finance Manager** (formerly CashFlowX) is a full-stack web application designed to help users efficiently **track income, expenses, and budgets**.  
+**CashFlowX** (formerly Personal Finance Manager) is a full-stack web application designed to help users efficiently **track income, expenses, and budgets**.  
 It offers **real-time visual insights** and **secure authentication** through a clean, modern, and responsive dashboard.
 
 Built with **React (Vite)** on the frontend and **Node.js + Express** on the backend, the application stores data in a **PostgreSQL database powered by Supabase**, ensuring reliability and scalability.  
@@ -107,10 +107,10 @@ Both the **frontend and backend are deployed on Render**, making the app easily 
 ## **Demo**
 
 Check out the live project here:  
-👉 [**Personal Finance Manager Live Demo**](https://personal-finance-manager1.onrender.com)
+👉 [**CashFlowX Live Demo**](https://personal-finance-manager1.onrender.com)
 
 GitHub Repository:  
-🔗 [**Personal Finance Manager Repo**](https://github.com/pran-ekaiva006/Personal-Finance-Manager)
+🔗 [**CashFlowX Repo**](https://github.com/pran-ekaiva006/Personal-Finance-Manager)
 
 ---
 
@@ -237,7 +237,7 @@ Open your browser and navigate to: **http://localhost:5174**
 ## 📂 Folder Structure
 
 ```bash
-Personal-Finance-Manager/
+CashFlowX/
 ├── .gitignore
 ├── LICENSE
 ├── README.md
@@ -477,7 +477,7 @@ This Project is Licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ```
 MIT License
 
-Copyright (c) 2024 Personal Finance Manager
+Copyright (c) 2025 Pranjal Kumar Verma
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -502,10 +502,9 @@ SOFTWARE.
 
 ## 👨‍💻 Author
 
-**Pran Ekaiva**
+**Pranjal Kumar Verma**
 
 - 🐙 GitHub: [@pran-ekaiva006](https://github.com/pran-ekaiva006)
-- 💼 LinkedIn: [Pran Ekaiva's LinkedIn](https://www.linkedin.com/in/your-linkedin-profile-url/)
 - 📧 Email: pranjalverma975@gmail.com
 
 ---
@@ -546,5 +545,5 @@ Need help? Here's how to reach out:
 </p>
 
 <p align="center">
-  <a href="#-personal-finance-manager">⬆️ Back to Top</a>
+  <a href="#-cashflowx">⬆️ Back to Top</a>
 </p>
