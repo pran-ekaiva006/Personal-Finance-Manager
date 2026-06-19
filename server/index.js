@@ -35,6 +35,12 @@ const startServer = async () => {
         try {
           await sequelize.sync();
           console.log("✅ DB Synced Successfully after reconnection");
+          try {
+            const { seedDemo } = await import("./scripts/seedDemo.js");
+            await seedDemo();
+          } catch (seedErr) {
+            console.error("❌ Failed to seed demo user after reconnection:", seedErr);
+          }
         } catch (err) {
           console.error("❌ Sequelize sync error after reconnection:", err);
         }
@@ -50,6 +56,12 @@ const startServer = async () => {
     try {
       await sequelize.sync();
       console.log("✅ DB Synced Successfully");
+      try {
+        const { seedDemo } = await import("./scripts/seedDemo.js");
+        await seedDemo();
+      } catch (seedErr) {
+        console.error("❌ Failed to seed demo user:", seedErr);
+      }
     } catch (err) {
       console.error("❌ Sequelize sync error:", err);
     }

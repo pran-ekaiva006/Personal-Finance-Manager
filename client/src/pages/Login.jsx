@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppProvider';
+import { useLocation } from 'react-router-dom';
 
 function Login() {
-  // Destructure login, register, and navigate functions from context
   const { login, register, navigate } = useAppContext();
+  const location = useLocation();
 
   // Track current form state: either 'login' or 'sign-up'
   const [state, setState] = useState('login');
+
+  useEffect(() => {
+    if (location.state?.mode === 'sign-up' || location.state?.mode === 'signUp') {
+      setState('sign-up');
+    } else {
+      setState('login');
+    }
+  }, [location.state]);
 
   // Form input values
   const [name, setName] = useState("");

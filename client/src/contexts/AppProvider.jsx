@@ -53,7 +53,7 @@ function AppProvider({ children }) {
       const { data } = await axios.post("auth/register", formData);
       setUser(data);
       toast.success("Registered successfully");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     }
@@ -64,7 +64,7 @@ function AppProvider({ children }) {
       const { data } = await axios.post("auth/login", formData);
       setUser(data);
       toast.success("Logged in successfully");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     }
@@ -86,7 +86,7 @@ function AppProvider({ children }) {
       const res = await axios.get("auth/me");
       setUser(res.data);
       if (window.location.pathname === "/login" || window.location.pathname === "/register") {
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch {
       setUser(null);

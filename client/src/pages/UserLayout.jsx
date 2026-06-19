@@ -27,7 +27,7 @@ export default function UserLayout() {
   }
 
   const menuItems = [
-    { name: "Dashboard", icon: <Home size={20} />, href: "/" },
+    { name: "Dashboard", icon: <Home size={20} />, href: "/dashboard" },
     { name: "Add Transactions", icon: <BadgeDollarSign size={20} />, href: "/add-transactions" },
     { name: "Transactions", icon: <History size={20} />, href: "/transactions" },
     { name: "Set Budgets", icon: <SlidersVertical size={20} />, href: "/set-budgets" },
@@ -65,7 +65,7 @@ export default function UserLayout() {
       >
         <div className="flex items-center justify-between px-5 py-8">
           <span
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="text-xl text-green-600 font-bold flex items-center gap-2 cursor-pointer"
           >
             <img src="./logo.png" alt="" className="size-8" /> CashFlowX
