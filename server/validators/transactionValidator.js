@@ -14,5 +14,8 @@ export const addTransactionSchema = z.object({
   description: z
     .string()
     .max(200, 'Description must be at most 200 characters')
-    .optional(),
+    .optional()
+    .nullable(),
+  isRecurring: z.boolean().optional(),
+  frequency: z.enum(['monthly', 'weekly']).optional().nullable(),
 });

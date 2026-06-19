@@ -9,6 +9,8 @@ const Transaction = sequelize.define('Transaction', {
   amount: { type: DataTypes.FLOAT, allowNull: false },
   description: { type: DataTypes.STRING },
   date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+  isRecurring: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+  frequency: { type: DataTypes.ENUM('monthly', 'weekly'), allowNull: true },
 });
 
 Transaction.belongsTo(User, { foreignKey: { allowNull: false }, onDelete: 'CASCADE' });

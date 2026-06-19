@@ -33,13 +33,15 @@ const startServer = async () => {
         
         // ✅ Sync models after reconnection
         try {
-          await sequelize.sync();
+          await sequelize.sync({ alter: true });
           console.log("✅ DB Synced Successfully after reconnection");
           try {
             const { seedDemo } = await import("./scripts/seedDemo.js");
             await seedDemo();
+            const { processRecurringTransactions } = await import("./scripts/processRecurring.js");
+            await processRecurringTransactions();
           } catch (seedErr) {
-            console.error("❌ Failed to seed demo user after reconnection:", seedErr);
+            console.error("❌ Failed to seed demo user or process recurring transactions after reconnection:", seedErr);
           }
         } catch (err) {
           console.error("❌ Sequelize sync error after reconnection:", err);
@@ -54,13 +56,15 @@ const startServer = async () => {
   // ✅ Sync models (only if connected)
   if (dbConnected) {
     try {
-      await sequelize.sync();
+      await sequelize.sync({ alter: true });
       console.log("✅ DB Synced Successfully");
       try {
         const { seedDemo } = await import("./scripts/seedDemo.js");
         await seedDemo();
+        const { processRecurringTransactions } = await import("./scripts/processRecurring.js");
+        await processRecurringTransactions();
       } catch (seedErr) {
-        console.error("❌ Failed to seed demo user:", seedErr);
+        console.error("❌ Failed to seed demo user or process recurring transactions:", seedErr);
       }
     } catch (err) {
       console.error("❌ Sequelize sync error:", err);
