@@ -1,7 +1,7 @@
 import React from "react";
 
 const BudgetCategoryItem = ({ item }) => {
-  console.log(item)
+
 
   const getPercentageColor = () => {
     if (100 - item.percentLeft > 100) return "text-red-500";
@@ -28,10 +28,10 @@ const BudgetCategoryItem = ({ item }) => {
           </div>
           <div className="text-sm">
             {item.remaining >= 0 ? (
-              <span className="text-green-600">Rs.{item.remaining} left</span>
+              <span className="text-green-600">Rs.{item.remaining.toFixed(2)} left</span>
             ) : (
               <span className="text-red-500">
-                Over budget by Rs.{Math.abs(item.remaining)}
+                Over budget by Rs.{Math.abs(item.remaining).toFixed(2)}
               </span>
             )}
           </div>

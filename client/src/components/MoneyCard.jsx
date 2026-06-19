@@ -9,9 +9,9 @@ function MoneyCard({ title, icon, amount=0, style, textColor = "",isPrice=true }
             </div>
             {
                 isPrice ? 
-                 <span className={`text-2xl font-bold ${textColor}`}>Rs.{(parseFloat(amount)).toFixed(2)}</span>
+                 <span className={`text-2xl font-bold ${textColor}`}>Rs.{Number(amount || 0).toFixed(2)}</span>
                  :
-                  <span className={`text-2xl font-bold ${textColor}`}>{parseFloat(amount).toFixed(2)}%</span>
+                  <span className={`text-2xl font-bold ${textColor}`}>{Number(amount || 0).toFixed(2)}%</span>
             }
           
         </div>

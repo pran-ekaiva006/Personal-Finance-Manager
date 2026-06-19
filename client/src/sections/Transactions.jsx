@@ -21,7 +21,7 @@ function TransactionHistory() {
     // Search by description
     if (search) {
       temp = temp.filter((t) =>
-        t.description.toLowerCase().includes(search.toLowerCase())
+        (t.description || '').toLowerCase().includes(search.toLowerCase())
       );
     }
 

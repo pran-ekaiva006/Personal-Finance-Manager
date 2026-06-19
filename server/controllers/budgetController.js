@@ -93,7 +93,7 @@ export const getBudgetUsageThisMonth = async (req, res) => {
     const report = budgets.map(budget => {
       const spent = expenseMap[budget.category] || 0;
       const remaining = budget.amount - spent;
-      const percentLeft = budget.amount === 0 ? 0 : ((remaining / budget.amount) * 100).toFixed(2);
+      const percentLeft = budget.amount === 0 ? 0 : parseFloat(((remaining / budget.amount) * 100).toFixed(2));
 
       return {
         category: budget.category,
@@ -108,7 +108,7 @@ export const getBudgetUsageThisMonth = async (req, res) => {
     const totalBudget = budgets.reduce((acc, b) => acc + b.amount, 0);
     const totalSpent = report.reduce((acc, b) => acc + b.spent, 0);
     const remaining = totalBudget - totalSpent;
-    const percentUsed = totalBudget === 0 ? 0 : ((totalSpent / totalBudget) * 100).toFixed(2);
+    const percentUsed = totalBudget === 0 ? 0 : parseFloat(((totalSpent / totalBudget) * 100).toFixed(2));
 
     res.json({
       month: month + 1,
