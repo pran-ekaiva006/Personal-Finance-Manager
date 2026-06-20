@@ -162,7 +162,11 @@ function AppProvider({ children }) {
   // ---------- Budgets ----------
   const addBudget = async (budget) => {
     try {
-      await axios.post("budgets", budget);
+      const payload = {
+        ...budget,
+        amount: Number(budget.amount)
+      };
+      await axios.post("budgets", payload);
       toast.success("Budget added");
     } catch {
       toast.error("Add budget failed");
@@ -183,7 +187,11 @@ function AppProvider({ children }) {
 
   const updateBudget = async (id, updates) => {
     try {
-      await axios.put(`budgets/${id}`, updates);
+      const payload = {
+        ...updates,
+        amount: Number(updates.amount)
+      };
+      await axios.put(`budgets/${id}`, payload);
       await getBudgets();
       toast.success("Budget updated");
     } catch {
