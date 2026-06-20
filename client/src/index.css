@@ -1,34 +1,96 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Fraunces:opsz,wght@9..144,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-ink: var(--color-ink);
-  --color-paper: var(--color-paper);
-  --color-signal: var(--color-signal);
-  --color-clay: var(--color-clay);
-  --color-muted: var(--color-muted);
-  --color-warning: var(--color-warning);
-  --font-serif-display: var(--font-serif-display);
+  /* Brand Colors */
+  --color-signal: #10B981;
+  --color-signal-dark: #059669;
+  --color-clay: #EF4444;
+  --color-clay-dark: #DC2626;
+  --color-warning: #F59E0B;
+  --color-accent: #6366F1;
+  --color-accent-dark: #4F46E5;
+
+  /* Surface System */
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-surface-3: var(--color-surface-3);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+
+  /* Text System */
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+
+  /* Legacy aliases kept for compatibility */
+  --color-ink: var(--color-text-primary);
+  --color-paper: var(--color-surface);
+  --color-muted: var(--color-text-muted);
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif-display: "Fraunces", serif;
+}
+
+/* ---------- Light Mode (default) ---------- */
+:root {
+  --color-surface:       #FFFFFF;
+  --color-surface-2:     #F8FAFC;
+  --color-surface-3:     #F1F5F9;
+  --color-border:        #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  --color-text-primary:   #0F172A;
+  --color-text-secondary: #334155;
+  --color-text-muted:     #64748B;
+}
+
+/* ---------- Dark Mode ---------- */
+/* Subtle, professional dark — NOT pitch-black. Uses slate-900/800 palette */
+.dark {
+  --color-surface:       #0F172A;
+  --color-surface-2:     #1E293B;
+  --color-surface-3:     #293548;
+  --color-border:        #1E293B;
+  --color-border-strong: #334155;
+
+  --color-text-primary:   #F1F5F9;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted:     #64748B;
 }
 
 @variant dark (&:where(.dark, .dark *));
 
-:root {
-  --color-ink: #0B1F17;
-  --color-paper: #F7F5F0;
-  --color-signal: #1F7A4D;
-  --color-clay: #C4622D;
-  --color-muted: #64748B;
-  --color-warning: #D97706;
-  --font-serif-display: "Fraunces", serif;
+/* ---------- Base Reset ---------- */
+*, *::before, *::after {
+  font-family: "Inter", system-ui, sans-serif;
+  box-sizing: border-box;
 }
 
-.dark {
-  --color-ink: #F7F5F0;
-  --color-paper: #0B1F17;
-  --color-muted: #94A3B8;
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-    font-family: "Outfit", sans-serif;
+body {
+  background-color: var(--color-surface-2);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ---------- Smooth theme transitions ---------- */
+/* Only animate color-related properties, not layout — prevents jank */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+/* Reset transition for interactive/motion elements to avoid conflicts */
+button, a, input, select, textarea {
+  transition-property: background-color, border-color, color, box-shadow, opacity, transform;
+  transition-duration: 0.15s;
 }

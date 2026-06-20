@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppProvider';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
+import { useDarkMode } from '../hooks/useDarkMode';
 
 function Login() {
   const { login, register, navigate } = useAppContext();
   const location = useLocation();
+  const { dark, toggle } = useDarkMode();
 
-  // Track current form state: either 'login' or 'sign-up'
   const [state, setState] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (location.state?.mode === 'sign-up' || location.state?.mode === 'signUp') {
@@ -17,155 +24,187 @@ function Login() {
     }
   }, [location.state]);
 
-  // Form input values
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  // Error message to display to user
-  const [error, setError] = useState("");
-
-  // Loading state to prevent double submissions
-  const [loading, setLoading] = useState(false);
-
-  // Form submission handler
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form behavior
-    setError(""); // Clear previous error
-    setLoading(true); // Set loading to true during request
-
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
       if (state === 'sign-up') {
-        // Call register function with user data
         await register({ name, email, password });
-        setState('login'); // Switch to login view after successful sign-up
+        setState('login');
       } else {
-        // Call login function
         await login({ email, password });
       }
-    } catch (err) {
-      // Show a user-friendly error message
-      setError("Something went wrong. Please try again.");
-      console.error(err);
+    } catch {
+      setError('Something went wrong. Please try again.');
     } finally {
-      setLoading(false); // Stop loading state
+      setLoading(false);
     }
   };
 
   return (
-    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-gray-100 to-white'>
-      <div className='bg-white p-8 rounded-xl shadow-xl w-full sm:w-96 text-gray-700'>
+    <div className="min-h-screen flex flex-col bg-[var(--color-surface-2)]">
 
-        {/* Logo and Title */}
-        <div className='border-b border-gray-200 px-2 py-6 mb-6'>
-          <div className='flex justify-center gap-2 items-center text-3xl font-black text-green-500'>
-            <img src="./logo.png" className="size-12" alt="Logo" />
-            <h1>CashFlowX</h1>
-          </div>
-          <p className='text-sm font-semibold mt-2 text-center'>Track Your Cash Flow</p>
-        </div>
+      {/* Top bar */}
+      <header className="flex items-center justify-between px-6 py-4">
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src="./logo.png" alt="Logo" className="w-7 h-7" />
+          <span className="text-sm font-bold text-[var(--color-text-primary)] tracking-tight">
+            CashFlowX
+          </span>
+        </Link>
+        <button
+          onClick={toggle}
+          aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="
+            flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium
+            text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]
+            bg-[var(--color-surface)] hover:bg-[var(--color-surface-3)]
+            border border-[var(--color-border)] cursor-pointer
+          "
+        >
+          {dark ? <Sun size={14} /> : <Moon size={14} />}
+          <span>{dark ? 'Light' : 'Dark'}</span>
+        </button>
+      </header>
 
-        {/* Header */}
-        <h2 className='text-3xl font-semibold text-gray-900 text-center mb-4'>
-          {state === "sign-up" ? "Create account" : "Login"}
-        </h2>
-        <p className='text-center text-sm mb-6 text-gray-500'>
-          {state === "sign-up" ? "Create your account" : "Login to your account"}
-        </p>
+      {/* Main */}
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-sm">
 
-        {/* Show error message */}
-        {error && (
-          <p className='text-red-500 text-sm text-center mb-4'>{error}</p>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Name input only for sign-up */}
-          {state === "sign-up" && (
-            <div className='mb-4'>
-              <input
-                type="text"
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder='Full Name'
-                required
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
+          {/* Card */}
+          <div className="
+            bg-[var(--color-surface)] border border-[var(--color-border)]
+            rounded-2xl p-8 shadow-sm
+          ">
+            {/* Heading */}
+            <div className="mb-6">
+              <h1 className="text-xl font-bold text-[var(--color-text-primary)]">
+                {state === 'sign-up' ? 'Create your account' : 'Welcome back'}
+              </h1>
+              <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                {state === 'sign-up'
+                  ? 'Start tracking your finances today.'
+                  : 'Sign in to continue to CashFlowX.'}
+              </p>
             </div>
-          )}
 
-          {/* Email input */}
-          <div className='mb-4'>
-            <input
-              type="email"
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder='Email id'
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-            />
-          </div>
+            {/* Error */}
+            {error && (
+              <div className="mb-4 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30">
+                <p className="text-xs font-medium text-clay">{error}</p>
+              </div>
+            )}
 
-          {/* Password input */}
-          <div className='mb-4'>
-            <input
-              type="password"
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder='Password'
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
-          </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {state === 'sign-up' && (
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">
+                    Full name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    autoComplete="name"
+                    placeholder="Alex Johnson"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="
+                      w-full px-3 py-2.5 rounded-xl text-sm
+                      bg-[var(--color-surface-2)] border border-[var(--color-border)]
+                      text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]
+                      focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent
+                    "
+                  />
+                </div>
+              )}
 
-          {/* Forgot password link (login only) */}
-          {state === "login" && (
-            <div className="text-right mb-4">
-              <span
-                className="text-sm text-blue-600 cursor-pointer hover:underline"
-                onClick={() => navigate("/forgot-password")}
+              <div>
+                <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1.5">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="
+                    w-full px-3 py-2.5 rounded-xl text-sm
+                    bg-[var(--color-surface-2)] border border-[var(--color-border)]
+                    text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]
+                    focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent
+                  "
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-medium text-[var(--color-text-secondary)]">
+                    Password
+                  </label>
+                  {state === 'login' && (
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs text-accent hover:text-accent-dark font-medium"
+                    >
+                      Forgot password?
+                    </Link>
+                  )}
+                </div>
+                <input
+                  type="password"
+                  required
+                  autoComplete={state === 'sign-up' ? 'new-password' : 'current-password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="
+                    w-full px-3 py-2.5 rounded-xl text-sm
+                    bg-[var(--color-surface-2)] border border-[var(--color-border)]
+                    text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]
+                    focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent
+                  "
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="
+                  w-full py-2.5 rounded-xl text-sm font-semibold text-white
+                  bg-accent hover:bg-accent-dark
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-colors cursor-pointer mt-2
+                "
               >
-                Forgot password?
-              </span>
-            </div>
-          )}
+                {loading
+                  ? 'Please wait…'
+                  : state === 'sign-up' ? 'Create account' : 'Sign in'}
+              </button>
+            </form>
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className='w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all disabled:opacity-50'
-          >
-            {loading ? "Please wait..." : state === "sign-up" ? "Sign Up" : "Login"}
-          </button>
-        </form>
-
-        {/* Switch between Login and Sign Up */}
-        <div className='text-center mt-4'>
-          {state === "sign-up" ? (
-            <p className='text-sm text-gray-500'>
-              Already have an account?{" "}
-              <span
-                className='text-blue-600 cursor-pointer hover:underline'
-                onClick={() => setState("login")}
-              >
-                Login here
-              </span>
+            {/* Toggle mode */}
+            <p className="text-center text-xs text-[var(--color-text-muted)] mt-5">
+              {state === 'sign-up' ? (
+                <>Already have an account?{' '}
+                  <button onClick={() => setState('login')} className="text-accent font-semibold hover:underline cursor-pointer">
+                    Sign in
+                  </button>
+                </>
+              ) : (
+                <>Don't have an account?{' '}
+                  <button onClick={() => setState('sign-up')} className="text-accent font-semibold hover:underline cursor-pointer">
+                    Create one
+                  </button>
+                </>
+              )}
             </p>
-          ) : (
-            <p className='text-sm text-gray-500'>
-              Don't have an account?{" "}
-              <span
-                className='text-blue-600 cursor-pointer hover:underline'
-                onClick={() => setState("sign-up")}
-              >
-                Sign Up
-              </span>
-            </p>
-          )}
+          </div>
         </div>
-
-      </div>
+      </main>
     </div>
   );
 }

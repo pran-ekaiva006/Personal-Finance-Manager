@@ -6,7 +6,12 @@ import toast from "react-hot-toast";
 const AppContext = createContext();
 
 // ✅ Backend URL from .env MUST end with /api/
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+let backendUrl = import.meta.env.VITE_BACKEND_URL;
+if (import.meta.env.DEV && (!backendUrl || backendUrl.includes("onrender.com"))) {
+  backendUrl = "http://localhost:5001/api";
+}
+axios.defaults.baseURL = backendUrl;
+console.log("axios.defaults.baseURL configured to:", axios.defaults.baseURL);
 axios.defaults.withCredentials = true;
 
 const defaultExpenseCategories = [
@@ -21,6 +26,7 @@ const defaultExpenseCategories = [
 ];
 
 function AppProvider({ children }) {
+  const [authLoading, setAuthLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState("");
   const [search, setSearch] = useState("");
@@ -75,7 +81,7 @@ function AppProvider({ children }) {
       const { data } = await axios.post("auth/logout");
       setUser(null);
       toast.success(data?.message);
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       toast.error(err.response?.data?.message);
     }
@@ -85,12 +91,20 @@ function AppProvider({ children }) {
     try {
       const res = await axios.get("auth/me");
       setUser(res.data);
-      if (window.location.pathname === "/login" || window.location.pathname === "/register") {
+      // If user is logged in and on a public auth page, send them to dashboard
+      const authPages = ["/login", "/register", "/"];
+      if (authPages.includes(window.location.pathname)) {
         navigate("/dashboard");
       }
     } catch {
       setUser(null);
-      navigate("/login");
+      // Only redirect to landing page if on a protected route
+      const publicPaths = ["/", "/login", "/register", "/forgot-password"];
+      if (!publicPaths.includes(window.location.pathname)) {
+        navigate("/");
+      }
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -213,6 +227,25 @@ function AppProvider({ children }) {
     };
     fetchData();
   }, [user]);
+
+  // Show nothing (or a minimal splash) while auth state is being determined
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0F172A',
+        color: '#64748B',
+        fontSize: '13px',
+        fontFamily: '"Inter", system-ui, sans-serif',
+        letterSpacing: '0.025em',
+      }}>
+        <span>Loading…</span>
+      </div>
+    );
+  }
 
   return (
     <AppContext.Provider

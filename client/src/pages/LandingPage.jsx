@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../contexts/AppProvider';
-import { ArrowRight, CheckCircle, Github, ExternalLink, Sparkles, TrendingUp, SlidersVertical, BadgeDollarSign } from 'lucide-react';
+import { ArrowRight, Github, ExternalLink, Sparkles, TrendingUp, SlidersVertical, BadgeDollarSign, Sun, Moon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useDarkMode } from '../hooks/useDarkMode';
 
 function LandingPage() {
   const { user, login, navigate } = useAppContext();
+  const { dark, toggle } = useDarkMode();
   const [demoLoading, setDemoLoading] = useState(false);
 
   // If user is already logged in, automatically redirect to dashboard
@@ -49,7 +51,14 @@ function LandingPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggle}
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-800/60 border border-slate-700/60 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors cursor-pointer"
+            >
+              {dark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
             <Link
               to="/login"
               className="text-sm font-semibold text-slate-300 hover:text-white transition-colors"
@@ -59,7 +68,7 @@ function LandingPage() {
             <Link
               to="/login"
               state={{ mode: 'sign-up' }}
-              className="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition-colors"
+              className="px-4 py-1.5 text-sm font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition-colors"
             >
               Get Started
             </Link>

@@ -1,21 +1,56 @@
 import React from 'react'
+import { TrendingUp, TrendingDown, Percent } from 'lucide-react'
 
-function MoneyCard({ title, icon, amount=0, style, textColor = "", isPrice=true }) {
-    return (
-        <div className='w-full py-6 px-5 border border-gray-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 space-y-1 shadow-sm'>
-            <div className='flex items-center justify-between gap-4 text-sm font-semibold text-gray-700 dark:text-gray-300'>
-                <span>{title}</span>
-                <span className={`${style} text-xl`}>{icon}</span>
-            </div>
-            {
-                isPrice ? 
-                 <span className={`text-2xl font-bold ${textColor || "text-gray-900 dark:text-white"}`}>Rs.{Number(amount || 0).toFixed(2)}</span>
-                 :
-                  <span className={`text-2xl font-bold ${textColor || "text-gray-900 dark:text-white"}`}>{Number(amount || 0).toFixed(2)}%</span>
-            }
-          
+const TYPE_CONFIG = {
+  income: {
+    label: 'income',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    iconColor: 'text-signal',
+    valueColor: 'text-signal',
+    Icon: TrendingUp,
+  },
+  expense: {
+    label: 'expense',
+    iconBg: 'bg-red-50 dark:bg-red-950/30',
+    iconColor: 'text-clay',
+    valueColor: 'text-clay',
+    Icon: TrendingDown,
+  },
+  savings: {
+    label: 'savings',
+    iconBg: 'bg-[var(--color-surface-3)]',
+    iconColor: 'text-[var(--color-text-muted)]',
+    valueColor: 'text-[var(--color-text-primary)]',
+    Icon: Percent,
+  },
+};
+
+function MoneyCard({ title, amount = 0, type = 'income', isPrice = true }) {
+  const config = TYPE_CONFIG[type] || TYPE_CONFIG.income;
+  const { Icon, iconBg, iconColor, valueColor } = config;
+
+  const formattedValue = isPrice
+    ? `₹${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+    : `${Number(amount || 0).toFixed(1)}%`;
+
+  return (
+    <div className="
+      bg-[var(--color-surface)] border border-[var(--color-border)]
+      rounded-2xl p-5 shadow-sm
+    ">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide">
+          {title}
+        </p>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
+          <Icon size={15} className={iconColor} />
         </div>
-    )
+      </div>
+      <p className={`text-2xl font-bold ${valueColor}`}>
+        {formattedValue}
+      </p>
+    </div>
+  );
 }
 
-export default MoneyCard
+export default MoneyCard;

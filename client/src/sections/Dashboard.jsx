@@ -4,6 +4,11 @@ import SimpleLineChart from '../components/SimpleLineChart'
 import PieChart from '../components/PieChart'
 import { useAppContext } from '../contexts/AppProvider'
 
+const MONTHS = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+];
+
 function Dashboard() {
   const { statistic, yearData, navigate, fetchMonthlySummary } = useAppContext();
 
@@ -12,134 +17,128 @@ function Dashboard() {
 
   useEffect(() => {
     fetchMonthlySummary({ year: selectedYear, month: selectedMonth });
-  }, [selectedMonth, selectedYear, fetchMonthlySummary]);
+  }, [selectedMonth, selectedYear]);
 
   const isEmpty = statistic.income === 0 && statistic.expense === 0;
-  const displayMonthName = new Date(selectedYear, selectedMonth - 1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+  const displayMonthName = MONTHS[selectedMonth - 1] + ' ' + selectedYear;
+
+  const selectClass = `
+    px-2.5 py-1.5 rounded-lg text-xs font-medium
+    bg-[var(--color-surface-2)] border border-[var(--color-border)]
+    text-[var(--color-text-secondary)]
+    focus:outline-none focus:ring-2 focus:ring-accent/30
+    cursor-pointer
+  `;
 
   return (
     <div>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Page Header */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your financial overview at a glance</p>
+          <h1 className="text-xl font-bold text-[var(--color-text-primary)]">Dashboard</h1>
+          <p className="text-sm text-[var(--color-text-muted)] mt-0.5">Your financial overview at a glance</p>
         </div>
 
-        {/* Date Selector */}
-        <div className="flex gap-2 shrink-0">
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-signal cursor-pointer"
-          >
-            {Array.from({ length: 12 }, (_, i) => {
-              const date = new Date(0, i);
-              return (
-                <option key={i + 1} value={i + 1}>
-                  {date.toLocaleString('default', { month: 'long' })}
-                </option>
-              );
-            })}
+        {/* Period picker */}
+        <div className="flex items-center gap-2">
+          <select value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))} className={selectClass}>
+            {MONTHS.map((m, i) => (
+              <option key={i + 1} value={i + 1}>{m}</option>
+            ))}
           </select>
-
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white rounded-lg shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-signal cursor-pointer"
-          >
-            {Array.from({ length: 5 }, (_, i) => {
-              const y = new Date().getFullYear() - 2 + i;
-              return (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              );
-            })}
+          <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))} className={selectClass}>
+            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
           </select>
         </div>
       </div>
 
       {isEmpty ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-10 text-center max-w-md w-full shadow-sm">
-            <div className="text-5xl mb-4">📊</div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No transactions yet</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Start tracking your finances by recording your first income or expense.
+        <div className="flex items-center justify-center py-24">
+          <div className="
+            bg-[var(--color-surface)] border border-[var(--color-border)]
+            rounded-2xl p-10 text-center max-w-sm w-full shadow-sm
+          ">
+            <div className="w-12 h-12 rounded-2xl bg-[var(--color-surface-3)] flex items-center justify-center mx-auto mb-4 text-2xl">
+              📊
+            </div>
+            <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-1">No transactions yet</h2>
+            <p className="text-sm text-[var(--color-text-muted)] mb-5">
+              Start by recording your first income or expense.
             </p>
             <button
               onClick={() => navigate('/add-transactions')}
-              className="px-6 py-3 bg-signal text-white font-semibold rounded-lg hover:bg-opacity-95 transition-all cursor-pointer"
+              className="
+                px-5 py-2 rounded-lg text-sm font-semibold text-white
+                bg-accent hover:bg-accent-dark transition-colors cursor-pointer
+              "
             >
-              Add your first transaction
+              Add first transaction
             </button>
           </div>
         </div>
       ) : (
         <>
-          {/* Total Balance Hero Section */}
-          <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 mb-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+          {/* Balance Hero */}
+          <div className="
+            bg-[var(--color-surface)] border border-[var(--color-border)]
+            rounded-2xl p-6 mb-4 shadow-sm
+          ">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
-                <p className="text-xs md:text-sm font-semibold tracking-wider text-muted uppercase">Total Balance</p>
-                <h2 className={`text-5xl md:text-6xl font-black font-serif-display mt-2 ${
+                <p className="text-xs font-semibold tracking-widest text-[var(--color-text-muted)] uppercase mb-1">
+                  Total Balance
+                </p>
+                <p className={`text-4xl md:text-5xl font-bold font-serif-display ${
                   statistic.balance >= 0 ? 'text-signal' : 'text-clay'
                 }`}>
-                  Rs.{Number(statistic.balance || 0).toFixed(2)}
-                </h2>
+                  ₹{Number(statistic.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </p>
               </div>
-              <div className="text-left sm:text-right">
-                <span className="text-xs md:text-sm font-bold tracking-widest text-muted uppercase [font-variant:all-small-caps]">
-                  {displayMonthName}
-                </span>
-              </div>
+              <span className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider pb-1">
+                {displayMonthName}
+              </span>
             </div>
           </div>
 
-          {/* Other Three Cards in 3-column layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <MoneyCard 
-              title={"Monthly Income"} 
-              amount={statistic.income} 
-              icon={"+"} 
-              style={"text-signal"} 
-              textColor="text-signal" 
+          {/* Stat Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <MoneyCard
+              title="Monthly Income"
+              amount={statistic.income}
+              type="income"
             />
-            <MoneyCard 
-              title={"Monthly Expenses"} 
-              amount={statistic.expense} 
-              icon={"-"} 
-              style={"text-clay"} 
-              textColor="text-clay" 
+            <MoneyCard
+              title="Monthly Expenses"
+              amount={statistic.expense}
+              type="expense"
             />
-            <MoneyCard 
-              title={"Savings Rate"} 
+            <MoneyCard
+              title="Savings Rate"
+              amount={statistic.savingRate}
+              type="savings"
               isPrice={false}
-              amount={statistic.savingRate} 
-              icon={"%"} 
-              style={"text-gray-900 dark:text-white"} 
-              textColor={statistic.savingRate >= 0 ? "text-signal" : "text-clay"} 
             />
           </div>
 
+          {/* Charts */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-slate-800">
-              <h3 className="font-semibold text-2xl text-gray-900 dark:text-white">Income vs Expenses</h3>
-              <div className="mt-12">
-                <SimpleLineChart data={yearData} />
-              </div>
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 shadow-sm">
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">Income vs Expenses</h2>
+              <p className="text-xs text-[var(--color-text-muted)] mb-4">12-month trend</p>
+              <SimpleLineChart data={yearData} />
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-slate-800">
-              <h3 className="font-semibold text-2xl text-gray-900 dark:text-white">Expense Categories</h3>
-              <div>
-                <PieChart data={statistic?.categoryBreakdown} />
-              </div>
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 shadow-sm">
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">Expense Breakdown</h2>
+              <p className="text-xs text-[var(--color-text-muted)] mb-4">By category this month</p>
+              <PieChart data={statistic?.categoryBreakdown} />
             </div>
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

@@ -1,31 +1,42 @@
 import React from 'react'
-import {CalendarDays } from 'lucide-react';
-function TransactionCard({item}) {
-    return (
-        <div
-            className="flex justify-between items-center bg-gray-50 dark:bg-slate-900/60 border border-transparent dark:border-slate-800/80 px-4 py-4 rounded-xl shadow-sm"
-        >
-            <div>
-                <h4 className="font-bold text-lg text-gray-900 dark:text-white">{item.description || 'No Description'}</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{item.category}</p>
-                <div className="flex items-center text-sm text-gray-400 dark:text-gray-500 mt-1">
-                    <CalendarDays size={14} className="mr-1" />
-                    {new Date(item.date).toLocaleString()}
-                </div>
-            </div>
+import { CalendarDays } from 'lucide-react';
 
-            <div className="text-right">
-                <p
-                    className={`font-bold text-xl
-                        ${item.type === 'Expense' ? 'text-clay' : 'text-signal'
-                        }`}
-                >
-                    Rs.{parseFloat(item.amount).toFixed(2)}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{item.type}</p>
-            </div>
+function TransactionCard({ item }) {
+  const isExpense = item.type === 'Expense';
+
+  return (
+    <div className="flex justify-between items-center py-3.5 gap-4">
+      {/* Left */}
+      <div className="flex items-center gap-3 min-w-0">
+        {/* Type dot */}
+        <div className={`w-2 h-2 rounded-full shrink-0 ${isExpense ? 'bg-clay' : 'bg-signal'}`} />
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+            {item.description || 'No description'}
+          </p>
+          <div className="flex items-center gap-3 mt-0.5">
+            <span className="text-xs text-[var(--color-text-muted)]">{item.category}</span>
+            <span className="text-[10px] text-[var(--color-text-muted)] flex items-center gap-1">
+              <CalendarDays size={10} />
+              {new Date(item.date).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+              })}
+            </span>
+          </div>
         </div>
-    )
+      </div>
+
+      {/* Right */}
+      <div className="text-right shrink-0">
+        <p className={`text-sm font-semibold ${isExpense ? 'text-clay' : 'text-signal'}`}>
+          {isExpense ? '−' : '+'}₹{parseFloat(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </p>
+        {item.isRecurring && (
+          <span className="text-[10px] text-[var(--color-text-muted)]">↻ {item.frequency}</span>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default TransactionCard
+export default TransactionCard;

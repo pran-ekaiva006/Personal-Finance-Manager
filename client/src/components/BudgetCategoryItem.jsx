@@ -1,44 +1,42 @@
 import React from "react";
 
 const BudgetCategoryItem = ({ item }) => {
-  const getPercentageColor = () => {
-    if (100 - item.percentLeft > 100) return "text-clay";
-    if (100 - item.percentLeft >= 90) return "text-warning";
-    return "text-signal";
-  };
+  const spent = Number(item.spent || 0);
+  const allocated = Number(item.allocated || 0);
+  const remaining = Number(item.remaining || 0);
+  const pctUsed = allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0;
+
+  const barColor =
+    pctUsed >= 100 ? 'bg-clay' :
+    pctUsed >= 80  ? 'bg-warning' :
+                     'bg-signal';
+
+  const remainingColor = remaining >= 0 ? 'text-signal' : 'text-clay';
 
   return (
-    <div className="px-4 py-5 border border-gray-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-sm">
-      <div className="flex items-center mb-1 justify-between gap-4 space-y-2">
+    <div className="py-4">
+      <div className="flex items-start justify-between gap-4 mb-2.5">
         <div>
-          <div>
-            <div className="font-semibold text-lg text-gray-900 dark:text-white">{item.category}</div>
-            <div className="text-gray-600 dark:text-gray-400">
-              Rs.{item.spent.toFixed(2)} of Rs.{item.allocated.toFixed(2)}
-            </div>
-          </div>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">{item.category}</p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+            ₹{spent.toLocaleString('en-IN', { minimumFractionDigits: 2 })} of ₹{allocated.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </p>
         </div>
-
-        <div className="flex flex-col items-end">
-          <div className={`${getPercentageColor()} font-semibold`}>
-            {item.percentLeft}%
-          </div>
-          <div className="text-sm">
-            {item.remaining >= 0 ? (
-              <span className="text-signal font-semibold">Rs.{item.remaining.toFixed(2)} left</span>
-            ) : (
-              <span className="text-clay font-semibold">
-                Over budget by Rs.{Math.abs(item.remaining).toFixed(2)}
-              </span>
-            )}
-          </div>
+        <div className="text-right shrink-0">
+          <p className={`text-sm font-semibold ${remainingColor}`}>
+            {remaining >= 0
+              ? `₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} left`
+              : `₹${Math.abs(remaining).toLocaleString('en-IN', { minimumFractionDigits: 2 })} over`}
+          </p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{pctUsed.toFixed(0)}% used</p>
         </div>
       </div>
 
-      <div className="w-full h-2 bg-gray-200 dark:bg-slate-800 rounded mb-1">
+      {/* Progress bar */}
+      <div className="w-full h-1.5 bg-[var(--color-surface-3)] rounded-full overflow-hidden">
         <div
-          className="h-full bg-slate-900 dark:bg-slate-400 rounded"
-          style={{ width: `${100 - parseFloat(item.percentLeft)}%` }}
+          className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+          style={{ width: `${pctUsed}%` }}
         />
       </div>
     </div>
