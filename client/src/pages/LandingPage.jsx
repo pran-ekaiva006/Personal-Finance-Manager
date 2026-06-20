@@ -36,7 +36,7 @@ function LandingPage() {
     <div className="min-h-screen flex flex-col bg-[var(--color-surface-2)] text-[var(--color-text-primary)] antialiased font-sans transition-colors duration-300">
 
       {/* ── Header ──────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-surface-2/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-8.5 h-8.5 rounded-xl bg-accent/10 flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:bg-accent/20">
