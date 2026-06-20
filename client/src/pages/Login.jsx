@@ -5,7 +5,7 @@ import { Moon, Sun } from 'lucide-react';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 function Login() {
-  const { login, register, navigate } = useAppContext();
+  const { login, register } = useAppContext();
   const location = useLocation();
   const { dark, toggle } = useDarkMode();
 
