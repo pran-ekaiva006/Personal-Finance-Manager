@@ -33,31 +33,30 @@
   --font-serif-display: "Fraunces", serif;
 }
 
-/* ---------- Light Mode (default) ---------- */
+/* ---------- Light Mode (Warm Ivory / Sand Canvas) ---------- */
 :root {
   --color-surface:       #FFFFFF;
-  --color-surface-2:     #F8FAFC;
-  --color-surface-3:     #F1F5F9;
-  --color-border:        #E2E8F0;
-  --color-border-strong: #CBD5E1;
+  --color-surface-2:     #FAF9F6; /* Alabaster / Ivory backdrop */
+  --color-surface-3:     #F3F0E8; /* Soft warm sand for cards/wells */
+  --color-border:        #E5DFD3; /* Subtle sand border */
+  --color-border-strong: #D3C9B6;
 
-  --color-text-primary:   #0F172A;
-  --color-text-secondary: #334155;
-  --color-text-muted:     #64748B;
+  --color-text-primary:   #1C1917; /* Slate/stone off-black */
+  --color-text-secondary: #44403C;
+  --color-text-muted:     #78716C;
 }
 
-/* ---------- Dark Mode ---------- */
-/* Subtle, professional dark — NOT pitch-black. Uses slate-900/800 palette */
+/* ---------- Dark Mode (Onyx Carbon / Deep Slate) ---------- */
 .dark {
-  --color-surface:       #0F172A;
-  --color-surface-2:     #1E293B;
-  --color-surface-3:     #293548;
-  --color-border:        #1E293B;
-  --color-border-strong: #334155;
+  --color-surface:       #0A0A0C; /* Ink deep black card background */
+  --color-surface-2:     #101014; /* Deep matte charcoal main page backdrop */
+  --color-surface-3:     #181820; /* Card surface border layer */
+  --color-border:        #1F1F26; /* Dark gray border */
+  --color-border-strong: #2F2F3B;
 
-  --color-text-primary:   #F1F5F9;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted:     #64748B;
+  --color-text-primary:   #FAFAF9; /* Crisp clean off-white */
+  --color-text-secondary: #D6D3D1;
+  --color-text-muted:     #878680;
 }
 
 @variant dark (&:where(.dark, .dark *));
