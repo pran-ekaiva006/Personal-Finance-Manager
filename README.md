@@ -1,5 +1,7 @@
 # 💰 CashFlowX
 
+> **Live Production Workspace**: [personal-finance-manager1.onrender.com](https://personal-finance-manager1.onrender.com)
+
 CashFlowX is a full-stack, private-first personal finance ecosystem built to track expenses, manage category budgets, and analyze cashflow trends without connecting to banking credentials. It features automatic database seeding, recurring transaction cron tasks, and a responsive theme-synchronized design system.
 
 ---
